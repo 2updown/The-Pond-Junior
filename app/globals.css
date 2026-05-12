@@ -1,0 +1,122 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* The Pond — design tokens */
+    --bg-page: 220 17% 97%;          /* #F6F7F9 */
+    --bg-surface: 0 0% 100%;          /* #FFFFFF */
+    --bg-muted: 220 14% 94%;          /* #EDEFF3 */
+    --brand-50: 217 100% 96%;         /* #EAF2FF */
+    --brand-100: 217 100% 92%;        /* #D6E5FF */
+    --brand-500: 217 100% 62%;        /* #3E8BFF */
+    --brand-600: 217 75% 53%;         /* #2F73E0 */
+    --text-primary: 220 19% 14%;      /* #1A1F2B */
+    --text-secondary: 220 9% 46%;     /* #6B7280 */
+    --text-tertiary: 220 9% 65%;      /* #9CA3AF */
+    --divider: 220 13% 91%;           /* #E5E7EB */
+    --success: 142 71% 45%;           /* #22C55E */
+    --danger: 0 84% 60%;              /* #EF4444 */
+    --warning: 38 92% 50%;            /* #F59E0B */
+    --toast-bg: 222 11% 21%;          /* #2E323A */
+
+    /* shadcn/ui alias tokens (kept for component compat) */
+    --background: var(--bg-page);
+    --foreground: var(--text-primary);
+    --card: var(--bg-surface);
+    --card-foreground: var(--text-primary);
+    --popover: var(--bg-surface);
+    --popover-foreground: var(--text-primary);
+    --primary: var(--brand-500);
+    --primary-foreground: 0 0% 100%;
+    --secondary: var(--bg-muted);
+    --secondary-foreground: var(--text-primary);
+    --muted: var(--bg-muted);
+    --muted-foreground: var(--text-secondary);
+    --accent: var(--brand-50);
+    --accent-foreground: var(--brand-600);
+    --destructive: var(--danger);
+    --destructive-foreground: 0 0% 100%;
+    --border: var(--divider);
+    --input: var(--divider);
+    --ring: var(--brand-500);
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html, body {
+    background: hsl(var(--bg-page));
+    color: hsl(var(--text-primary));
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  /* App shell — mobile-first, centered on desktop */
+  .app-shell {
+    @apply mx-auto flex min-h-screen w-full max-w-[480px] flex-col bg-[hsl(var(--bg-page))];
+    box-shadow: 0 0 24px rgba(16, 24, 40, 0.06);
+  }
+
+  /* Topbar */
+  .topbar {
+    @apply sticky top-0 z-10 flex min-h-[48px] items-center justify-center px-5 pt-4 pb-3;
+    background: hsl(var(--bg-page));
+  }
+
+  /* Card hover */
+  .pond-card {
+    @apply rounded-2xl bg-white p-4 transition-transform;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  }
+  .pond-card:active {
+    transform: scale(0.99);
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08);
+  }
+
+  /* Toast pill (success / info / error) */
+  .pond-toast {
+    @apply pointer-events-auto inline-flex items-center gap-2.5 rounded-full px-4 py-3 text-sm font-medium text-white;
+    background: hsla(222, 11%, 21%, 0.94);
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08);
+  }
+
+  /* Empty illustration halo */
+  .empty-illustration {
+    @apply relative flex h-20 w-20 items-center justify-center rounded-[20px] bg-white;
+    box-shadow: 0 8px 24px rgba(62, 139, 255, 0.18);
+  }
+  .empty-illustration::after {
+    content: "";
+    position: absolute;
+    inset: -12px;
+    border-radius: 32px;
+    background: radial-gradient(circle, rgba(62, 139, 255, 0.18) 0%, transparent 70%);
+    z-index: -1;
+  }
+}
+
+/* PC layout: sidebar takes left 240px, app-shell fills the rest */
+@media (min-width: 768px) {
+  .app-shell {
+    margin-left: 240px;
+    margin-right: 0;
+    max-width: none;
+    box-shadow: none;
+  }
+  .topbar {
+    justify-content: flex-start;
+    background: #ffffff;
+    border-bottom: 1px solid hsl(var(--divider));
+    padding: 20px 32px;
+    min-height: 64px;
+  }
+}

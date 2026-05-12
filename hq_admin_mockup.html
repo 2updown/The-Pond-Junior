@@ -1,0 +1,1627 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1280" />
+<title>HCIS · HQ Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+  // Mirror the HCIS design system tokens (app/globals.css + tailwind.config.ts)
+  tailwind.config = {
+    darkMode: ['class'],
+    theme: {
+      container: { center: true, padding: '2rem', screens: { '2xl': '1400px' } },
+      extend: {
+        colors: {
+          border: 'hsl(var(--border))',
+          input: 'hsl(var(--input))',
+          ring: 'hsl(var(--ring))',
+          background: 'hsl(var(--background))',
+          foreground: 'hsl(var(--foreground))',
+          primary: { DEFAULT: 'hsl(var(--primary))', foreground: 'hsl(var(--primary-foreground))' },
+          secondary: { DEFAULT: 'hsl(var(--secondary))', foreground: 'hsl(var(--secondary-foreground))' },
+          destructive: { DEFAULT: 'hsl(var(--destructive))', foreground: 'hsl(var(--destructive-foreground))' },
+          muted: { DEFAULT: 'hsl(var(--muted))', foreground: 'hsl(var(--muted-foreground))' },
+          accent: { DEFAULT: 'hsl(var(--accent))', foreground: 'hsl(var(--accent-foreground))' },
+          popover: { DEFAULT: 'hsl(var(--popover))', foreground: 'hsl(var(--popover-foreground))' },
+          card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
+        },
+        borderRadius: {
+          lg: 'var(--radius)',
+          md: 'calc(var(--radius) - 2px)',
+          sm: 'calc(var(--radius) - 4px)',
+        },
+        fontFamily: {
+          sans: ['ui-sans-serif','-apple-system','BlinkMacSystemFont','Segoe UI','Inter','Roboto','Helvetica Neue','Arial','sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+  html, body { height: 100%; }
+  body {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+  * { border-color: hsl(var(--border)); }
+
+  /* Subtle page-shell background to add depth without colour */
+  .app-shell-bg { background: linear-gradient(180deg, hsl(210 40% 98.5%), hsl(210 40% 99.5%)); }
+
+  /* Custom scrollbar for a more enterprise feel */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: hsl(214.3 31.8% 88%); border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(214.3 31.8% 78%); border: 2px solid transparent; background-clip: content-box; }
+
+  /* Focus ring style matching DS */
+  .ring-ds:focus-visible { outline: none; box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring)); }
+
+  /* Switch */
+  .switch { position: relative; display: inline-flex; height: 20px; width: 36px; flex-shrink: 0; cursor: pointer; align-items: center; border-radius: 9999px; transition: background-color .15s ease; background: hsl(var(--muted)); }
+  .switch[data-on="true"] { background: hsl(var(--primary)); }
+  .switch::after { content: ''; position: absolute; top: 2px; left: 2px; height: 16px; width: 16px; border-radius: 9999px; background: #fff; transition: transform .15s ease; box-shadow: 0 1px 2px rgba(0,0,0,.15); }
+  .switch[data-on="true"]::after { transform: translateX(16px); }
+
+  /* Sidebar nav active marker */
+  .nav-active { color: hsl(var(--primary)); background: hsl(var(--primary) / 0.08); }
+  .nav-active .nav-dot { background: hsl(var(--primary)); }
+
+  /* Tabs */
+  .tab { position: relative; padding: 12px 4px; color: hsl(var(--muted-foreground)); font-size: 14px; font-weight: 500; }
+  .tab[aria-selected="true"] { color: hsl(var(--foreground)); }
+  .tab[aria-selected="true"]::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; background: hsl(var(--foreground)); border-radius: 2px; }
+
+  /* Modal */
+  dialog::backdrop { background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(2px); }
+  dialog { padding: 0; border: 0; border-radius: var(--radius); background: transparent; }
+
+  /* Sticky table chrome */
+  thead.sticky th { position: sticky; top: 0; background: hsl(var(--background)); z-index: 1; }
+
+  /* Row selected */
+  tr[data-selected="true"] { background: hsl(var(--primary) / 0.05); box-shadow: inset 1px 0 0 hsl(var(--primary) / 0.4); }
+
+  /* Tiny donut */
+  .donut { --p: 0; --c: hsl(var(--primary));
+    width: 132px; aspect-ratio: 1; border-radius: 50%;
+    background: conic-gradient(var(--c) calc(var(--p) * 1%), hsl(var(--muted)) 0);
+    display: grid; place-items: center;
+  }
+  .donut::before { content: ''; width: 70%; aspect-ratio: 1; background: hsl(var(--card)); border-radius: 50%; }
+
+  /* Skeleton shimmer (used inline in stub pages) */
+  .shimmer { background: linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(210 40% 92%) 50%, hsl(var(--muted)) 100%); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+</style>
+</head>
+<body class="app-shell-bg">
+
+<!-- ===================== APP SHELL ===================== -->
+<div class="flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="sticky top-0 h-screen w-64 shrink-0 border-r bg-card flex flex-col">
+    <div class="flex items-center gap-2 px-5 h-14 border-b">
+      <div class="h-8 w-8 rounded-md bg-primary text-primary-foreground grid place-items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M10 14h4v6h-4z"/></svg>
+      </div>
+      <div class="leading-tight">
+        <div class="text-sm font-semibold">HCIS · HQ</div>
+        <div class="text-[11px] text-muted-foreground">Headquarters admin</div>
+      </div>
+      <span class="ml-auto inline-flex items-center rounded-full border-transparent bg-violet-100 text-violet-700 px-2 py-0.5 text-[10px] font-medium">v0.4</span>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto py-3 text-sm">
+      <!-- Dashboard -->
+      <div class="px-3">
+        <button data-nav="dashboard" class="nav-item nav-active w-full flex items-center gap-2 rounded-md px-3 py-2 text-left">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>
+          <span class="font-medium">Dashboard</span>
+        </button>
+      </div>
+
+      <!-- Branch Management -->
+      <div class="px-3 mt-4">
+        <div class="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Branch Management</div>
+        <button data-nav="branches"     class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Branch List
+        </button>
+        <button data-nav="branch-detail" class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Branch Detail
+        </button>
+        <button data-nav="permissions"  class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>User Permissions
+        </button>
+      </div>
+
+      <!-- Brand Site Management -->
+      <div class="px-3 mt-4">
+        <div class="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Brand Site Management</div>
+        <button data-nav="brand-status" class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Brand Site Status
+        </button>
+        <button data-nav="templates"    class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Template Management
+        </button>
+        <button data-nav="domains"      class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Domain Settings
+        </button>
+        <button data-nav="publishing"   class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Publishing Permissions
+        </button>
+        <button data-nav="storage"      class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Storage Usage
+        </button>
+      </div>
+
+      <!-- Subscription & Billing -->
+      <div class="px-3 mt-4">
+        <div class="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Subscription &amp; Billing</div>
+        <button data-nav="plans"    class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Plan Management
+        </button>
+        <button data-nav="features" class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Feature Access
+        </button>
+        <button data-nav="payments" class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Payment Status
+        </button>
+      </div>
+
+      <!-- System Settings -->
+      <div class="px-3 mt-4 mb-3">
+        <div class="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">System Settings</div>
+        <button data-nav="global"        class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Global Settings
+        </button>
+        <button data-nav="notifications" class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Notification Settings
+        </button>
+        <button data-nav="defaults"      class="nav-item w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-foreground/80 hover:text-foreground hover:bg-accent">
+          <span class="nav-dot inline-block h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>Template Defaults
+        </button>
+      </div>
+    </nav>
+
+    <div class="border-t p-3">
+      <div class="flex items-center gap-3 rounded-md p-2 hover:bg-accent">
+        <div class="h-8 w-8 rounded-full bg-muted grid place-items-center text-xs font-semibold text-muted-foreground">SK</div>
+        <div class="min-w-0 flex-1 leading-tight">
+          <div class="text-sm font-medium truncate">Sangha Kim</div>
+          <div class="text-xs text-muted-foreground truncate">Platform admin</div>
+        </div>
+        <button class="text-muted-foreground hover:text-foreground" title="Sign out">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main column -->
+  <div class="flex-1 min-w-0 flex flex-col">
+    <!-- Top bar -->
+    <header class="sticky top-0 z-30 h-14 border-b bg-card/80 backdrop-blur flex items-center gap-3 px-6">
+      <div class="flex items-center gap-2 text-sm text-muted-foreground" id="breadcrumb">
+        <span>HQ</span><span class="text-border">/</span><span class="text-foreground">Dashboard</span>
+      </div>
+      <div class="ml-auto flex items-center gap-3">
+        <div class="relative">
+          <input type="text" placeholder="Search branches, domains, plans…" class="ring-ds h-9 w-[320px] rounded-md border bg-background pl-9 pr-3 text-sm placeholder:text-muted-foreground" />
+          <svg class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+        <button class="ring-ds inline-flex items-center gap-2 h-9 px-3 rounded-md border text-sm hover:bg-accent">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span>Production</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <button class="ring-ds relative inline-flex items-center justify-center h-9 w-9 rounded-md border hover:bg-accent" title="Notifications">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="absolute -top-1 -right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">4</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Pages -->
+    <main id="page-root" class="flex-1 px-6 py-6">
+      <!-- Pages are appended here by JS -->
+    </main>
+
+    <footer class="px-6 py-4 text-xs text-muted-foreground border-t bg-card/60">
+      HCIS · HQ Admin · Mockup built on the existing design system. Tokens: <code class="px-1 rounded bg-muted">--primary</code>, <code class="px-1 rounded bg-muted">--muted</code>, <code class="px-1 rounded bg-muted">--radius</code>.
+    </footer>
+  </div>
+</div>
+
+<!-- ============ MODAL: Suspend Site (destructive) ============ -->
+<dialog id="modal-suspend">
+  <div class="w-[480px] rounded-lg border bg-card text-card-foreground shadow-xl overflow-hidden">
+    <div class="p-6">
+      <div class="flex items-start gap-3">
+        <div class="h-10 w-10 rounded-lg bg-destructive/10 text-destructive grid place-items-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        </div>
+        <div class="min-w-0 flex-1">
+          <div class="text-base font-semibold leading-none tracking-tight">Suspend brand site</div>
+          <div class="mt-1.5 text-sm text-muted-foreground">
+            This will take <span class="font-medium text-foreground">Gangnam HQ Branch</span> offline for visitors.
+            The branch admin keeps access to drafts but cannot publish until restored.
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 rounded-md border bg-muted/30 p-3 text-sm">
+        <div class="text-muted-foreground">Reason <span class="text-destructive">*</span></div>
+        <select class="ring-ds mt-1.5 h-9 w-full rounded-md border bg-background px-2 text-sm">
+          <option>Non-payment</option>
+          <option>Compliance violation</option>
+          <option>Trademark / domain dispute</option>
+          <option>Branch request</option>
+        </select>
+      </div>
+
+      <div class="mt-3">
+        <label class="text-sm">Type <span class="font-mono font-semibold">SUSPEND</span> to confirm</label>
+        <input id="suspend-confirm" type="text" autocomplete="off" placeholder="SUSPEND" class="ring-ds mt-1.5 h-9 w-full rounded-md border bg-background px-3 text-sm" />
+      </div>
+    </div>
+    <div class="flex items-center justify-end gap-2 border-t bg-muted/30 px-6 py-3">
+      <button data-close-modal class="ring-ds inline-flex items-center h-9 px-3 rounded-md border bg-background text-sm hover:bg-accent">Cancel</button>
+      <button id="suspend-go" disabled class="ring-ds inline-flex items-center h-9 px-3 rounded-md bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed">Suspend site</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ============ TOAST ============ -->
+<div id="toast-host" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+
+<!-- ============ PAGE TEMPLATES ============ -->
+<template id="tpl-dashboard">
+  <section class="space-y-6">
+    <!-- Page header -->
+    <div class="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Platform overview</h1>
+        <p class="text-sm text-muted-foreground mt-1">A live snapshot of every branch on HCIS. Last refreshed just now.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="ring-ds h-9 px-3 rounded-md border text-sm hover:bg-accent inline-flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button class="ring-ds h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 inline-flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add branch
+        </button>
+      </div>
+    </div>
+
+    <!-- Stat row -->
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12 md:col-span-6 xl:col-span-3 rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="flex items-center gap-4 p-5">
+          <div class="h-10 w-10 rounded-lg bg-primary/10 text-primary grid place-items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="text-xs uppercase tracking-wide text-muted-foreground">Total branches</div>
+            <div class="mt-1 text-2xl font-semibold">142</div>
+            <div class="mt-0.5 text-xs text-muted-foreground"><span class="text-emerald-700 font-medium">+6</span> this month</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-span-12 md:col-span-6 xl:col-span-3 rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="flex items-center gap-4 p-5">
+          <div class="h-10 w-10 rounded-lg bg-emerald-50 text-emerald-700 grid place-items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="text-xs uppercase tracking-wide text-muted-foreground">Active brand sites</div>
+            <div class="mt-1 text-2xl font-semibold">98</div>
+            <div class="mt-0.5 text-xs text-muted-foreground">69% of branches</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-span-12 md:col-span-6 xl:col-span-3 rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="flex items-center gap-4 p-5">
+          <div class="h-10 w-10 rounded-lg bg-amber-50 text-amber-700 grid place-items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="text-xs uppercase tracking-wide text-muted-foreground">Pending approvals</div>
+            <div class="mt-1 text-2xl font-semibold">7</div>
+            <div class="mt-0.5 text-xs text-muted-foreground">Oldest 14h ago</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-span-12 md:col-span-6 xl:col-span-3 rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="flex items-center gap-4 p-5">
+          <div class="h-10 w-10 rounded-lg bg-sky-50 text-sky-700 grid place-items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="text-xs uppercase tracking-wide text-muted-foreground">Storage used</div>
+            <div class="mt-1 text-2xl font-semibold">412 <span class="text-base text-muted-foreground font-medium">/ 800 GB</span></div>
+            <div class="mt-0.5 text-xs text-muted-foreground">52% of platform quota</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="grid grid-cols-12 gap-4">
+      <!-- Activity feed -->
+      <div class="col-span-12 xl:col-span-8 rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="flex items-center justify-between p-6">
+          <div>
+            <div class="text-base font-semibold leading-none tracking-tight">Activity</div>
+            <div class="mt-1 text-sm text-muted-foreground">Cross-branch events from the audit log.</div>
+          </div>
+          <div class="flex items-center gap-1 text-sm">
+            <button class="px-2 py-1 rounded-md hover:bg-accent text-muted-foreground">All</button>
+            <button class="px-2 py-1 rounded-md bg-accent text-foreground">Publishing</button>
+            <button class="px-2 py-1 rounded-md hover:bg-accent text-muted-foreground">Plans</button>
+            <button class="px-2 py-1 rounded-md hover:bg-accent text-muted-foreground">Domains</button>
+          </div>
+        </div>
+        <div class="px-6 pb-6">
+          <ul class="space-y-3">
+            <!-- item -->
+            <li class="flex items-start gap-3 rounded-md border bg-background p-3">
+              <div class="h-8 w-8 rounded-md bg-emerald-50 text-emerald-700 grid place-items-center shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="text-sm"><span class="font-medium">Songpa Branch</span> published a new homepage revision.</div>
+                <div class="mt-0.5 text-xs text-muted-foreground">By Park Jiwon · 12 min ago</div>
+              </div>
+              <span class="inline-flex items-center rounded-full border-transparent bg-emerald-100 text-emerald-700 px-2.5 py-0.5 text-xs font-medium">Published</span>
+            </li>
+            <li class="flex items-start gap-3 rounded-md border bg-background p-3">
+              <div class="h-8 w-8 rounded-md bg-amber-50 text-amber-700 grid place-items-center shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="text-sm"><span class="font-medium">Hongdae Language Center</span> requested approval for a homepage change.</div>
+                <div class="mt-0.5 text-xs text-muted-foreground">By Lee Minho · 38 min ago · awaiting HQ review</div>
+              </div>
+              <span class="inline-flex items-center rounded-full border-transparent bg-sky-100 text-sky-700 px-2.5 py-0.5 text-xs font-medium">Under review</span>
+            </li>
+            <li class="flex items-start gap-3 rounded-md border bg-background p-3">
+              <div class="h-8 w-8 rounded-md bg-violet-50 text-violet-700 grid place-items-center shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.7 1 6.4 2.6"/><polyline points="21 3 21 9 15 9"/></svg>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="text-sm">Plan upgraded for <span class="font-medium">Bundang STEM</span>: Pro → Business.</div>
+                <div class="mt-0.5 text-xs text-muted-foreground">By you · 2 h ago</div>
+              </div>
+              <span class="inline-flex items-center rounded-full border-transparent bg-violet-100 text-violet-700 px-2.5 py-0.5 text-xs font-medium">Plan</span>
+            </li>
+            <li class="flex items-start gap-3 rounded-md border bg-background p-3">
+              <div class="h-8 w-8 rounded-md bg-rose-50 text-rose-700 grid place-items-center shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="text-sm">Payment failed for <span class="font-medium">Daejeon Math Hagwon</span> · Invoice #4382.</div>
+                <div class="mt-0.5 text-xs text-muted-foreground">Yesterday · retry in 24h</div>
+              </div>
+              <span class="inline-flex items-center rounded-full border-transparent bg-destructive text-destructive-foreground px-2.5 py-0.5 text-xs font-medium">Failed</span>
+            </li>
+            <li class="flex items-start gap-3 rounded-md border bg-background p-3">
+              <div class="h-8 w-8 rounded-md bg-sky-50 text-sky-700 grid place-items-center shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="text-sm"><span class="font-medium">jamsil-academy.kr</span> connected as a custom domain for Jamsil Academy.</div>
+                <div class="mt-0.5 text-xs text-muted-foreground">2 days ago · SSL active</div>
+              </div>
+              <span class="inline-flex items-center rounded-full border-transparent bg-emerald-100 text-emerald-700 px-2.5 py-0.5 text-xs font-medium">SSL active</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Health panel -->
+      <div class="col-span-12 xl:col-span-4 rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="p-6">
+          <div class="text-base font-semibold leading-none tracking-tight">Platform health</div>
+          <div class="mt-1 text-sm text-muted-foreground">Items that may require HQ attention.</div>
+        </div>
+        <div class="px-6 pb-6 space-y-3">
+          <a class="block rounded-md border p-3 hover:bg-accent">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center rounded-full border-transparent bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">SSL</span>
+              <div class="text-sm font-medium">3 domains expiring &lt; 14d</div>
+            </div>
+            <div class="mt-1 text-xs text-muted-foreground">jamsil-academy.kr · ilsan-school.com · busan-academy.kr</div>
+          </a>
+          <a class="block rounded-md border p-3 hover:bg-accent">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center rounded-full border-transparent bg-destructive text-destructive-foreground px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">Quota</span>
+              <div class="text-sm font-medium">2 branches over storage limit</div>
+            </div>
+            <div class="mt-1 text-xs text-muted-foreground">Songpa, Mokdong — uploads paused</div>
+          </a>
+          <a class="block rounded-md border p-3 hover:bg-accent">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center rounded-full border-transparent bg-rose-100 text-rose-700 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">Billing</span>
+              <div class="text-sm font-medium">1 payment failed</div>
+            </div>
+            <div class="mt-1 text-xs text-muted-foreground">Daejeon Math Hagwon · auto-retry in 24h</div>
+          </a>
+          <a class="block rounded-md border p-3 hover:bg-accent">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center rounded-full border-transparent bg-sky-100 text-sky-700 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">Review</span>
+              <div class="text-sm font-medium">7 publish requests in queue</div>
+            </div>
+            <div class="mt-1 text-xs text-muted-foreground">Oldest waiting 14h</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="grid grid-cols-12 gap-4">
+      <!-- Plan distribution -->
+      <div class="col-span-12 lg:col-span-6 rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="p-6 pb-0">
+          <div class="text-base font-semibold leading-none tracking-tight">Plan distribution</div>
+          <div class="mt-1 text-sm text-muted-foreground">Branches by tier.</div>
+        </div>
+        <div class="p-6 flex items-center gap-6">
+          <div class="donut" style="--p:69; --c: hsl(var(--primary))"></div>
+          <ul class="text-sm space-y-2 flex-1">
+            <li class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-sm bg-muted-foreground/40"></span>Free</span><span class="font-medium">22</span></li>
+            <li class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-sm bg-sky-400"></span>Pro</span><span class="font-medium">63</span></li>
+            <li class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-sm bg-violet-400"></span>Business</span><span class="font-medium">42</span></li>
+            <li class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-sm bg-primary"></span>Enterprise</span><span class="font-medium">15</span></li>
+          </ul>
+        </div>
+      </div>
+      <!-- Top branches by traffic -->
+      <div class="col-span-12 lg:col-span-6 rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="p-6 pb-3 flex items-center justify-between">
+          <div>
+            <div class="text-base font-semibold leading-none tracking-tight">Top branches · 30d traffic</div>
+            <div class="mt-1 text-sm text-muted-foreground">Visits to brand sites.</div>
+          </div>
+          <button class="text-xs text-muted-foreground hover:text-foreground">View all →</button>
+        </div>
+        <div class="px-6 pb-6 space-y-3">
+          <div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="font-medium">Gangnam HQ</span><span class="text-muted-foreground">38,210</span>
+            </div>
+            <div class="mt-1 h-1.5 rounded-full bg-muted overflow-hidden"><div class="h-full bg-primary" style="width: 92%"></div></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="font-medium">Songpa Branch</span><span class="text-muted-foreground">29,841</span>
+            </div>
+            <div class="mt-1 h-1.5 rounded-full bg-muted overflow-hidden"><div class="h-full bg-primary" style="width: 71%"></div></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="font-medium">Bundang STEM</span><span class="text-muted-foreground">22,005</span>
+            </div>
+            <div class="mt-1 h-1.5 rounded-full bg-muted overflow-hidden"><div class="h-full bg-primary" style="width: 53%"></div></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="font-medium">Hongdae Language Center</span><span class="text-muted-foreground">17,432</span>
+            </div>
+            <div class="mt-1 h-1.5 rounded-full bg-muted overflow-hidden"><div class="h-full bg-primary" style="width: 42%"></div></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="font-medium">Jamsil Academy</span><span class="text-muted-foreground">12,940</span>
+            </div>
+            <div class="mt-1 h-1.5 rounded-full bg-muted overflow-hidden"><div class="h-full bg-primary" style="width: 31%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<!-- ============== BRANCH LIST ============== -->
+<template id="tpl-branches">
+  <section class="space-y-5">
+    <div class="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Branches</h1>
+        <p class="text-sm text-muted-foreground mt-1">All academy branches across the platform. 142 total.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="ring-ds h-9 px-3 rounded-md border text-sm hover:bg-accent inline-flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+        <button class="ring-ds h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 inline-flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add branch
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b">
+      <div class="flex items-center gap-6">
+        <button class="tab" aria-selected="true">All <span class="ml-1 text-xs text-muted-foreground">142</span></button>
+        <button class="tab" aria-selected="false">Active <span class="ml-1 text-xs text-muted-foreground">131</span></button>
+        <button class="tab" aria-selected="false">Suspended <span class="ml-1 text-xs text-muted-foreground">3</span></button>
+        <button class="tab" aria-selected="false">Pending activation <span class="ml-1 text-xs text-muted-foreground">8</span></button>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="flex flex-wrap items-center gap-2">
+      <div class="relative">
+        <input type="text" placeholder="Search branch, domain, manager…" class="ring-ds h-9 w-[280px] rounded-md border bg-background pl-9 pr-3 text-sm" />
+        <svg class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+      <select class="ring-ds h-9 rounded-md border bg-background px-2 text-sm">
+        <option>All plans</option><option>Free</option><option>Pro</option><option>Business</option><option>Enterprise</option>
+      </select>
+      <select class="ring-ds h-9 rounded-md border bg-background px-2 text-sm">
+        <option>Brand site: any</option><option>Enabled</option><option>Disabled</option><option>Suspended</option>
+      </select>
+      <select class="ring-ds h-9 rounded-md border bg-background px-2 text-sm">
+        <option>Publishing: any</option><option>Published</option><option>Draft</option><option>Under review</option><option>Changes requested</option>
+      </select>
+      <button class="ring-ds h-9 px-3 rounded-md border text-sm hover:bg-accent inline-flex items-center gap-2 text-muted-foreground">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+        More filters
+      </button>
+      <div class="ml-auto text-xs text-muted-foreground">Sorted by <span class="font-medium text-foreground">Last updated ↓</span></div>
+    </div>
+
+    <!-- Table -->
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden">
+      <div class="relative w-full overflow-auto">
+        <table class="w-full caption-bottom text-sm">
+          <thead class="sticky [&_tr]:border-b">
+            <tr>
+              <th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground w-10">
+                <input id="select-all" type="checkbox" class="h-4 w-4 rounded border-border" />
+              </th>
+              <th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">Branch</th>
+              <th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">Brand site</th>
+              <th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">Plan</th>
+              <th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">Publishing</th>
+              <th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">Domain</th>
+              <th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">Storage</th>
+              <th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">Last updated</th>
+              <th class="h-11 px-4 text-right align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground w-14">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="[&_tr:last-child]:border-0" id="branch-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex items-center justify-between px-4 py-3 border-t bg-card">
+        <div class="text-xs text-muted-foreground">Showing <span class="text-foreground font-medium">1–10</span> of 142</div>
+        <div class="flex items-center gap-1">
+          <button class="ring-ds h-8 w-8 rounded-md border hover:bg-accent grid place-items-center" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="h-8 min-w-8 px-2.5 rounded-md bg-primary text-primary-foreground text-sm font-medium">1</button>
+          <button class="h-8 min-w-8 px-2.5 rounded-md hover:bg-accent text-sm">2</button>
+          <button class="h-8 min-w-8 px-2.5 rounded-md hover:bg-accent text-sm">3</button>
+          <span class="px-1 text-muted-foreground text-sm">…</span>
+          <button class="h-8 min-w-8 px-2.5 rounded-md hover:bg-accent text-sm">15</button>
+          <button class="ring-ds h-8 w-8 rounded-md border hover:bg-accent grid place-items-center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <select class="ml-2 ring-ds h-8 rounded-md border bg-background px-2 text-xs">
+            <option>10 / page</option><option>25 / page</option><option>50 / page</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk action tray (shown only when something is selected) -->
+    <div id="bulk-tray" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 rounded-full border bg-card px-3 py-2 shadow-xl">
+      <span class="text-xs text-muted-foreground pl-2"><span id="bulk-count" class="font-medium text-foreground">0</span> selected</span>
+      <span class="h-5 w-px bg-border mx-1"></span>
+      <button class="ring-ds h-8 px-3 rounded-full text-xs hover:bg-accent inline-flex items-center gap-1.5">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.7 1 6.4 2.6"/><polyline points="21 3 21 9 15 9"/></svg>
+        Change plan
+      </button>
+      <button class="ring-ds h-8 px-3 rounded-full text-xs hover:bg-accent inline-flex items-center gap-1.5">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Assign template
+      </button>
+      <button class="ring-ds h-8 px-3 rounded-full text-xs hover:bg-accent inline-flex items-center gap-1.5">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Toggle brand site
+      </button>
+      <button class="ring-ds h-8 px-3 rounded-full text-xs hover:bg-accent text-destructive inline-flex items-center gap-1.5">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Suspend
+      </button>
+    </div>
+  </section>
+</template>
+
+<!-- ============== BRANCH DETAIL ============== -->
+<template id="tpl-branch-detail">
+  <section class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div class="flex items-center gap-4">
+        <div class="h-14 w-14 rounded-lg bg-gradient-to-br from-primary to-sky-500 text-primary-foreground grid place-items-center text-lg font-bold shadow-sm">G</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-2xl font-semibold tracking-tight">Gangnam HQ Branch</h1>
+            <span class="inline-flex items-center rounded-full border-transparent bg-emerald-100 text-emerald-700 px-2.5 py-0.5 text-xs font-medium">Enabled</span>
+            <span class="inline-flex items-center rounded-full border-transparent bg-violet-100 text-violet-700 px-2.5 py-0.5 text-xs font-medium">Business</span>
+            <span class="inline-flex items-center rounded-full border-transparent bg-emerald-100 text-emerald-700 px-2.5 py-0.5 text-xs font-medium">Published</span>
+          </div>
+          <p class="mt-1 text-sm text-muted-foreground">ID <code class="px-1 rounded bg-muted text-xs">br_01HRZ…gp7</code> · gangnam-hq.hcis.app · created Mar 2024</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="ring-ds h-9 px-3 rounded-md border text-sm hover:bg-accent inline-flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          View site
+        </button>
+        <button class="ring-ds h-9 px-3 rounded-md border text-sm hover:bg-accent inline-flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          Open admin (read-only)
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b">
+      <div class="flex items-center gap-6 overflow-x-auto">
+        <button class="tab" aria-selected="true">Overview</button>
+        <button class="tab" aria-selected="false">Brand Site</button>
+        <button class="tab" aria-selected="false">Plan</button>
+        <button class="tab" aria-selected="false">Usage</button>
+        <button class="tab" aria-selected="false">Permissions</button>
+        <button class="tab" aria-selected="false">Activity</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-6">
+      <!-- Main column -->
+      <div class="col-span-12 xl:col-span-8 space-y-6">
+
+        <!-- A. Basic information -->
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+          <div class="p-6 pb-3">
+            <div class="text-base font-semibold leading-none tracking-tight">Basic information</div>
+            <div class="mt-1 text-sm text-muted-foreground">Branch profile shown publicly on the brand site.</div>
+          </div>
+          <div class="px-6 pb-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+            <div>
+              <div class="text-xs text-muted-foreground uppercase tracking-wide">Branch name</div>
+              <div class="mt-1 font-medium">Gangnam HQ Branch</div>
+            </div>
+            <div>
+              <div class="text-xs text-muted-foreground uppercase tracking-wide">Branch manager</div>
+              <div class="mt-1 flex items-center gap-2">
+                <span class="h-6 w-6 rounded-full bg-muted grid place-items-center text-[10px] font-semibold text-muted-foreground">JY</span>
+                <span class="font-medium">Jung Yuna</span>
+                <span class="text-xs text-muted-foreground">· yuna@gangnam.hcis.app</span>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-muted-foreground uppercase tracking-wide">Address</div>
+              <div class="mt-1">427 Teheran-ro, Gangnam-gu, Seoul 06168, KR</div>
+            </div>
+            <div>
+              <div class="text-xs text-muted-foreground uppercase tracking-wide">Contact</div>
+              <div class="mt-1">+82 02-555-0188 · hello@gangnam.hcis.app</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- B. Brand site status -->
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+          <div class="p-6 pb-3 flex items-center justify-between">
+            <div>
+              <div class="text-base font-semibold leading-none tracking-tight">Brand site status</div>
+              <div class="mt-1 text-sm text-muted-foreground">HQ-controlled gates — branch admins handle the actual content.</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-muted-foreground">Brand site</span>
+              <span class="switch" data-on="true" role="switch" aria-checked="true"></span>
+            </div>
+          </div>
+          <div class="px-6 pb-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+            <div>
+              <div class="text-xs text-muted-foreground uppercase tracking-wide">Current template</div>
+              <div class="mt-1 flex items-center gap-3">
+                <div class="h-10 w-14 rounded-md bg-muted overflow-hidden border grid place-items-center text-[10px] text-muted-foreground">Aurora</div>
+                <div>
+                  <div class="font-medium">Aurora · Academy</div>
+                  <div class="text-xs text-muted-foreground">Assigned by HQ · Apr 12 2026</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-muted-foreground uppercase tracking-wide">Domain</div>
+              <div class="mt-1 flex items-center gap-2">
+                <code class="px-1.5 py-0.5 rounded bg-muted text-xs">gangnam-academy.kr</code>
+                <span class="inline-flex items-center rounded-full border-transparent bg-emerald-100 text-emerald-700 px-2 py-0.5 text-[10px] font-medium">SSL active</span>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-muted-foreground uppercase tracking-wide">Publishing status</div>
+              <div class="mt-1 flex items-center gap-2">
+                <span class="inline-flex items-center rounded-full border-transparent bg-emerald-100 text-emerald-700 px-2.5 py-0.5 text-xs font-medium">Published</span>
+                <span class="text-xs text-muted-foreground">Last published 2 days ago by <span class="text-foreground">Jung Yuna</span></span>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-muted-foreground uppercase tracking-wide">HQ approval before publish</div>
+              <div class="mt-1 flex items-center gap-2">
+                <span class="switch" data-on="true" role="switch" aria-checked="true"></span>
+                <span class="text-sm">Required</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- D. Usage metrics -->
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+          <div class="p-6 pb-3 flex items-center justify-between">
+            <div>
+              <div class="text-base font-semibold leading-none tracking-tight">Usage · last 30 days</div>
+              <div class="mt-1 text-sm text-muted-foreground">Read-only metrics from analytics service.</div>
+            </div>
+            <select class="ring-ds h-8 rounded-md border bg-background px-2 text-xs"><option>30 days</option><option>7 days</option><option>90 days</option></select>
+          </div>
+          <div class="px-6 pb-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="rounded-md border p-4">
+              <div class="text-xs uppercase tracking-wide text-muted-foreground">Visitors</div>
+              <div class="mt-1 text-2xl font-semibold">38,210</div>
+              <div class="text-xs text-emerald-700">+12% vs prior 30d</div>
+            </div>
+            <div class="rounded-md border p-4">
+              <div class="text-xs uppercase tracking-wide text-muted-foreground">Inquiries</div>
+              <div class="mt-1 text-2xl font-semibold">428</div>
+              <div class="text-xs text-emerald-700">+8% vs prior 30d</div>
+            </div>
+            <div class="rounded-md border p-4">
+              <div class="text-xs uppercase tracking-wide text-muted-foreground">Storage used</div>
+              <div class="mt-1 text-2xl font-semibold">3.2 <span class="text-base text-muted-foreground font-medium">/ 5 GB</span></div>
+              <div class="mt-2 h-1.5 rounded-full bg-muted overflow-hidden"><div class="h-full bg-primary" style="width: 64%"></div></div>
+            </div>
+            <div class="rounded-md border p-4">
+              <div class="text-xs uppercase tracking-wide text-muted-foreground">Last publish</div>
+              <div class="mt-1 text-base font-medium">May 4 · 14:08 KST</div>
+              <div class="text-xs text-muted-foreground">By Jung Yuna · revision #142</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- E. Permissions -->
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+          <div class="p-6 pb-3 flex items-center justify-between">
+            <div>
+              <div class="text-base font-semibold leading-none tracking-tight">Permissions</div>
+              <div class="mt-1 text-sm text-muted-foreground">Who at the branch can edit and publish the brand site.</div>
+            </div>
+            <button class="ring-ds h-9 px-3 rounded-md border text-sm hover:bg-accent inline-flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+              Invite editor
+            </button>
+          </div>
+          <div class="overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="[&_tr]:border-b">
+                <tr>
+                  <th class="h-11 px-6 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">User</th>
+                  <th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">Role</th>
+                  <th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">Can publish</th>
+                  <th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">Last activity</th>
+                  <th class="h-11 px-6 w-10"></th>
+                </tr>
+              </thead>
+              <tbody class="[&_tr:last-child]:border-0">
+                <tr class="border-b hover:bg-muted/40">
+                  <td class="px-6 py-3">
+                    <div class="flex items-center gap-3">
+                      <span class="h-8 w-8 rounded-full bg-muted grid place-items-center text-xs font-semibold text-muted-foreground">JY</span>
+                      <div>
+                        <div class="font-medium">Jung Yuna</div>
+                        <div class="text-xs text-muted-foreground">yuna@gangnam.hcis.app</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center rounded-full border-transparent bg-primary text-primary-foreground px-2.5 py-0.5 text-xs font-medium">Owner</span></td>
+                  <td class="px-4 py-3"><span class="switch" data-on="true"></span></td>
+                  <td class="px-4 py-3 text-muted-foreground">2 hours ago</td>
+                  <td class="px-6 py-3 text-right">
+                    <button class="h-8 w-8 grid place-items-center rounded-md hover:bg-accent text-muted-foreground"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+                  </td>
+                </tr>
+                <tr class="border-b hover:bg-muted/40">
+                  <td class="px-6 py-3">
+                    <div class="flex items-center gap-3">
+                      <span class="h-8 w-8 rounded-full bg-muted grid place-items-center text-xs font-semibold text-muted-foreground">CS</span>
+                      <div>
+                        <div class="font-medium">Choi Soomin</div>
+                        <div class="text-xs text-muted-foreground">soomin@gangnam.hcis.app</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center rounded-full border-transparent bg-secondary text-secondary-foreground px-2.5 py-0.5 text-xs font-medium">Editor</span></td>
+                  <td class="px-4 py-3"><span class="switch" data-on="true"></span></td>
+                  <td class="px-4 py-3 text-muted-foreground">Yesterday</td>
+                  <td class="px-6 py-3 text-right"><button class="h-8 w-8 grid place-items-center rounded-md hover:bg-accent text-muted-foreground"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></td>
+                </tr>
+                <tr class="hover:bg-muted/40">
+                  <td class="px-6 py-3">
+                    <div class="flex items-center gap-3">
+                      <span class="h-8 w-8 rounded-full bg-muted grid place-items-center text-xs font-semibold text-muted-foreground">PJ</span>
+                      <div>
+                        <div class="font-medium">Park Jihoon</div>
+                        <div class="text-xs text-muted-foreground">jihoon@gangnam.hcis.app</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center rounded-full border-transparent bg-muted text-muted-foreground px-2.5 py-0.5 text-xs font-medium">Viewer</span></td>
+                  <td class="px-4 py-3"><span class="switch" data-on="false"></span></td>
+                  <td class="px-4 py-3 text-muted-foreground">3 days ago</td>
+                  <td class="px-6 py-3 text-right"><button class="h-8 w-8 grid place-items-center rounded-md hover:bg-accent text-muted-foreground"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side column -->
+      <div class="col-span-12 xl:col-span-4 space-y-6">
+        <!-- Quick actions -->
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+          <div class="p-6 pb-3">
+            <div class="text-base font-semibold leading-none tracking-tight">Quick actions</div>
+          </div>
+          <div class="px-6 pb-6 space-y-2 text-sm">
+            <button class="w-full h-10 px-3 rounded-md border hover:bg-accent text-left flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.7 1 6.4 2.6"/><polyline points="21 3 21 9 15 9"/></svg>
+              Change plan
+              <svg class="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button class="w-full h-10 px-3 rounded-md border hover:bg-accent text-left flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Assign template
+              <svg class="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button class="w-full h-10 px-3 rounded-md border hover:bg-accent text-left flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              Reset domain
+              <svg class="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button class="w-full h-10 px-3 rounded-md border hover:bg-accent text-left flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+              Resend manager invite
+              <svg class="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button data-open-modal="modal-suspend" class="w-full h-10 px-3 rounded-md border border-destructive/20 text-destructive hover:bg-destructive/5 text-left flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              Suspend brand site
+              <svg class="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- C. Plan card -->
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+          <div class="p-6 pb-3 flex items-center justify-between">
+            <div>
+              <div class="text-base font-semibold leading-none tracking-tight">Plan</div>
+              <div class="mt-1 text-sm text-muted-foreground">Subscription &amp; entitlements.</div>
+            </div>
+            <span class="inline-flex items-center rounded-full border-transparent bg-violet-100 text-violet-700 px-2.5 py-0.5 text-xs font-medium">Business</span>
+          </div>
+          <div class="px-6 pb-6">
+            <div class="rounded-md border p-3 mb-4">
+              <div class="text-xs text-muted-foreground uppercase tracking-wide">Monthly cost</div>
+              <div class="mt-0.5 text-xl font-semibold">₩390,000 <span class="text-xs text-muted-foreground font-normal">/ branch</span></div>
+              <div class="text-xs text-muted-foreground mt-0.5">Renews on Jun 1 2026</div>
+            </div>
+            <div class="text-xs uppercase tracking-wide text-muted-foreground mb-2">Active features</div>
+            <ul class="space-y-1.5 text-sm">
+              <li class="flex items-center gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-emerald-600"><polyline points="20 6 9 17 4 12"/></svg> Custom domain</li>
+              <li class="flex items-center gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-emerald-600"><polyline points="20 6 9 17 4 12"/></svg> HQ approval workflow</li>
+              <li class="flex items-center gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-emerald-600"><polyline points="20 6 9 17 4 12"/></svg> Analytics &amp; inquiries</li>
+              <li class="flex items-center gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-emerald-600"><polyline points="20 6 9 17 4 12"/></svg> 5 GB media storage</li>
+              <li class="flex items-center gap-2 text-muted-foreground"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Multi-language pages <span class="text-xs">· Enterprise only</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Branch manager mini -->
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+          <div class="p-6">
+            <div class="text-base font-semibold leading-none tracking-tight">Branch manager</div>
+            <div class="mt-4 flex items-center gap-3">
+              <span class="h-12 w-12 rounded-full bg-gradient-to-br from-sky-400 to-violet-500 grid place-items-center text-white font-semibold">JY</span>
+              <div class="min-w-0">
+                <div class="font-medium">Jung Yuna</div>
+                <div class="text-xs text-muted-foreground truncate">yuna@gangnam.hcis.app</div>
+                <div class="text-xs text-muted-foreground">+82 02-555-0188</div>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center gap-2">
+              <button class="ring-ds h-8 px-3 rounded-md border text-xs hover:bg-accent flex-1">Send message</button>
+              <button class="ring-ds h-8 px-3 rounded-md border text-xs hover:bg-accent flex-1">View profile</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<!-- ============== BRAND SITE STATUS (HQ-level) ============== -->
+<template id="tpl-brand-status">
+  <section class="space-y-6">
+    <div class="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Brand site status</h1>
+        <p class="text-sm text-muted-foreground mt-1">Live state of every branch's brand site. HQ approves, suspends, and restores — branches do the editing.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="ring-ds h-9 px-3 rounded-md border text-sm hover:bg-accent inline-flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+          Sync now
+        </button>
+      </div>
+    </div>
+
+    <!-- Stat row, condensed -->
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-6 xl:col-span-3 rounded-lg border bg-card shadow-sm p-4">
+        <div class="text-xs uppercase tracking-wide text-muted-foreground">Published</div>
+        <div class="mt-1 text-2xl font-semibold text-emerald-700">86</div>
+      </div>
+      <div class="col-span-6 xl:col-span-3 rounded-lg border bg-card shadow-sm p-4">
+        <div class="text-xs uppercase tracking-wide text-muted-foreground">Draft / unpublished</div>
+        <div class="mt-1 text-2xl font-semibold">12</div>
+      </div>
+      <div class="col-span-6 xl:col-span-3 rounded-lg border bg-card shadow-sm p-4">
+        <div class="text-xs uppercase tracking-wide text-muted-foreground">Awaiting HQ review</div>
+        <div class="mt-1 text-2xl font-semibold text-sky-700">7</div>
+      </div>
+      <div class="col-span-6 xl:col-span-3 rounded-lg border bg-card shadow-sm p-4">
+        <div class="text-xs uppercase tracking-wide text-muted-foreground">Suspended</div>
+        <div class="mt-1 text-2xl font-semibold text-destructive">3</div>
+      </div>
+    </div>
+
+    <!-- Tabs / approval queue -->
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+      <div class="border-b px-6">
+        <div class="flex items-center gap-6">
+          <button class="tab" aria-selected="true">All sites</button>
+          <button class="tab" aria-selected="false">Approval queue <span class="ml-1 text-xs rounded-full bg-sky-100 text-sky-700 px-1.5 py-0.5">7</span></button>
+          <button class="tab" aria-selected="false">Recently changed</button>
+        </div>
+      </div>
+
+      <!-- Approval queue mock content -->
+      <div class="p-6 space-y-3">
+        <div class="rounded-md border p-4 flex items-center gap-4">
+          <div class="h-10 w-10 rounded-md bg-gradient-to-br from-sky-400 to-violet-500 text-white grid place-items-center font-semibold shrink-0">H</div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-medium">Hongdae Language Center</span>
+              <span class="inline-flex items-center rounded-full border-transparent bg-sky-100 text-sky-700 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">Under review</span>
+            </div>
+            <div class="text-xs text-muted-foreground mt-0.5">Submitted by Lee Minho · 38 min ago · changes to homepage hero + 3 program cards</div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button class="ring-ds h-9 px-3 rounded-md border text-sm hover:bg-accent">Preview</button>
+            <button class="ring-ds h-9 px-3 rounded-md border border-amber-300 text-amber-700 text-sm hover:bg-amber-50">Request changes</button>
+            <button class="ring-ds h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90">Approve</button>
+          </div>
+        </div>
+        <div class="rounded-md border p-4 flex items-center gap-4">
+          <div class="h-10 w-10 rounded-md bg-gradient-to-br from-amber-400 to-rose-500 text-white grid place-items-center font-semibold shrink-0">J</div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-medium">Jamsil Academy</span>
+              <span class="inline-flex items-center rounded-full border-transparent bg-sky-100 text-sky-700 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">Under review</span>
+            </div>
+            <div class="text-xs text-muted-foreground mt-0.5">Submitted by Kim Heejin · 2 h ago · new pricing page</div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button class="ring-ds h-9 px-3 rounded-md border text-sm hover:bg-accent">Preview</button>
+            <button class="ring-ds h-9 px-3 rounded-md border border-amber-300 text-amber-700 text-sm hover:bg-amber-50">Request changes</button>
+            <button class="ring-ds h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90">Approve</button>
+          </div>
+        </div>
+        <div class="rounded-md border p-4 flex items-center gap-4">
+          <div class="h-10 w-10 rounded-md bg-gradient-to-br from-emerald-400 to-sky-500 text-white grid place-items-center font-semibold shrink-0">B</div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-medium">Bundang STEM</span>
+              <span class="inline-flex items-center rounded-full border-transparent bg-sky-100 text-sky-700 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">Under review</span>
+            </div>
+            <div class="text-xs text-muted-foreground mt-0.5">Submitted by Han Jisoo · 5 h ago · footer + privacy policy update</div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button class="ring-ds h-9 px-3 rounded-md border text-sm hover:bg-accent">Preview</button>
+            <button class="ring-ds h-9 px-3 rounded-md border border-amber-300 text-amber-700 text-sm hover:bg-amber-50">Request changes</button>
+            <button class="ring-ds h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90">Approve</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings cards (the platform-level controls) -->
+    <div class="grid grid-cols-12 gap-4">
+      <!-- Publishing controls -->
+      <div class="col-span-12 xl:col-span-6 rounded-lg border bg-card shadow-sm">
+        <div class="p-6 pb-3">
+          <div class="text-base font-semibold leading-none tracking-tight">Publishing controls</div>
+          <div class="mt-1 text-sm text-muted-foreground">Platform-wide defaults. Per-branch overrides live on Branch Detail.</div>
+        </div>
+        <div class="px-6 pb-6 divide-y">
+          <div class="flex items-start justify-between py-3 first:pt-0">
+            <div class="pr-6">
+              <div class="text-sm font-medium">Allow publishing</div>
+              <div class="text-xs text-muted-foreground mt-0.5">If disabled, branches see drafts but can't publish.</div>
+            </div>
+            <span class="switch" data-on="true"></span>
+          </div>
+          <div class="flex items-start justify-between py-3">
+            <div class="pr-6">
+              <div class="text-sm font-medium">Require HQ approval before publish</div>
+              <div class="text-xs text-muted-foreground mt-0.5">Routes every publish through the queue above.</div>
+            </div>
+            <span class="switch" data-on="true"></span>
+          </div>
+          <div class="flex items-start justify-between py-3 last:pb-0">
+            <div class="pr-6">
+              <div class="text-sm font-medium">Draft-only mode</div>
+              <div class="text-xs text-muted-foreground mt-0.5">Branches edit drafts but no version is ever published.</div>
+            </div>
+            <span class="switch" data-on="false"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Storage management -->
+      <div class="col-span-12 xl:col-span-6 rounded-lg border bg-card shadow-sm">
+        <div class="p-6 pb-3">
+          <div class="text-base font-semibold leading-none tracking-tight">Storage management</div>
+          <div class="mt-1 text-sm text-muted-foreground">Upload limits applied to every brand site.</div>
+        </div>
+        <div class="px-6 pb-6 grid grid-cols-2 gap-4">
+          <div class="rounded-md border p-3">
+            <div class="text-xs text-muted-foreground uppercase tracking-wide">Platform usage</div>
+            <div class="mt-1 text-xl font-semibold">412 / 800 GB</div>
+            <div class="mt-2 h-1.5 rounded-full bg-muted overflow-hidden"><div class="h-full bg-primary" style="width: 52%"></div></div>
+          </div>
+          <div class="rounded-md border p-3">
+            <div class="text-xs text-muted-foreground uppercase tracking-wide">Max upload size</div>
+            <div class="mt-1 text-xl font-semibold">25 MB</div>
+            <button class="mt-1 text-xs text-primary hover:underline">Edit</button>
+          </div>
+          <div class="rounded-md border p-3">
+            <div class="text-xs text-muted-foreground uppercase tracking-wide">Branches over quota</div>
+            <div class="mt-1 text-xl font-semibold text-destructive">2</div>
+            <div class="text-xs text-muted-foreground">Songpa, Mokdong</div>
+          </div>
+          <div class="rounded-md border p-3">
+            <div class="text-xs text-muted-foreground uppercase tracking-wide">Allowed file types</div>
+            <div class="mt-1 text-xs flex flex-wrap gap-1">
+              <span class="rounded bg-muted px-1.5 py-0.5">jpg</span>
+              <span class="rounded bg-muted px-1.5 py-0.5">png</span>
+              <span class="rounded bg-muted px-1.5 py-0.5">webp</span>
+              <span class="rounded bg-muted px-1.5 py-0.5">svg</span>
+              <span class="rounded bg-muted px-1.5 py-0.5">pdf</span>
+              <span class="rounded bg-muted px-1.5 py-0.5">mp4</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</template>
+
+<!-- ============== STUB PAGES ============== -->
+<template id="tpl-permissions">
+  <section>
+    <div class="flex items-end justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">User permissions</h1>
+        <p class="text-sm text-muted-foreground mt-1">HQ admins, branch admins, and editor roles across the platform.</p>
+      </div>
+    </div>
+    <div class="mt-6 rounded-lg border border-dashed bg-muted/20 px-6 py-14 flex flex-col items-center text-center">
+      <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+      </div>
+      <div class="text-base font-semibold">Permissions matrix coming next</div>
+      <div class="mt-1 max-w-sm text-sm text-muted-foreground">This page will show a role × capability matrix scoped to each branch, with bulk role-change actions.</div>
+      <div class="mt-4"><span class="inline-flex items-center rounded-full border-transparent bg-sky-100 text-sky-700 px-2.5 py-0.5 text-xs font-medium">Stub · spec'd in design doc</span></div>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-templates">
+  <section>
+    <div class="flex items-end justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Template management</h1>
+        <p class="text-sm text-muted-foreground mt-1">Templates HQ makes available to branches. One default per category.</p>
+      </div>
+      <button class="ring-ds h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 inline-flex items-center gap-2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Upload template
+      </button>
+    </div>
+    <div class="mt-6 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <!-- preview cards -->
+      <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+        <div class="aspect-[4/3] bg-gradient-to-br from-sky-100 to-sky-300 grid place-items-center text-sky-800 font-semibold">Aurora</div>
+        <div class="p-4">
+          <div class="flex items-center gap-2"><div class="font-medium text-sm">Aurora</div><span class="inline-flex items-center rounded-full border-transparent bg-primary text-primary-foreground px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">Default</span></div>
+          <div class="text-xs text-muted-foreground">Academy · 24 branches</div>
+          <div class="mt-3 flex items-center gap-2">
+            <button class="ring-ds h-8 px-2.5 rounded-md border text-xs hover:bg-accent flex-1">Preview</button>
+            <button class="ring-ds h-8 px-2.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 flex-1">Assign</button>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+        <div class="aspect-[4/3] bg-gradient-to-br from-violet-100 to-violet-300 grid place-items-center text-violet-800 font-semibold">Lumen</div>
+        <div class="p-4">
+          <div class="font-medium text-sm">Lumen</div>
+          <div class="text-xs text-muted-foreground">Language · 9 branches</div>
+          <div class="mt-3 flex items-center gap-2">
+            <button class="ring-ds h-8 px-2.5 rounded-md border text-xs hover:bg-accent flex-1">Preview</button>
+            <button class="ring-ds h-8 px-2.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 flex-1">Assign</button>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+        <div class="aspect-[4/3] bg-gradient-to-br from-emerald-100 to-emerald-300 grid place-items-center text-emerald-800 font-semibold">Atlas</div>
+        <div class="p-4">
+          <div class="font-medium text-sm">Atlas</div>
+          <div class="text-xs text-muted-foreground">Kids · 12 branches</div>
+          <div class="mt-3 flex items-center gap-2">
+            <button class="ring-ds h-8 px-2.5 rounded-md border text-xs hover:bg-accent flex-1">Preview</button>
+            <button class="ring-ds h-8 px-2.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 flex-1">Assign</button>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-lg border bg-card shadow-sm overflow-hidden">
+        <div class="aspect-[4/3] bg-gradient-to-br from-amber-100 to-amber-300 grid place-items-center text-amber-800 font-semibold">Beacon</div>
+        <div class="p-4">
+          <div class="flex items-center gap-2"><div class="font-medium text-sm">Beacon</div><span class="inline-flex items-center rounded-full border-transparent bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">Beta</span></div>
+          <div class="text-xs text-muted-foreground">General · 0 branches</div>
+          <div class="mt-3 flex items-center gap-2">
+            <button class="ring-ds h-8 px-2.5 rounded-md border text-xs hover:bg-accent flex-1">Preview</button>
+            <button class="ring-ds h-8 px-2.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 flex-1">Assign</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-domains">
+  <section>
+    <div class="flex items-end justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Domain settings</h1>
+        <p class="text-sm text-muted-foreground mt-1">Custom domains connected by branches on Pro+ plans.</p>
+      </div>
+    </div>
+    <div class="mt-6 rounded-lg border bg-card shadow-sm overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="[&_tr]:border-b">
+          <tr>
+            <th class="h-11 px-6 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Domain</th>
+            <th class="h-11 px-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Branch</th>
+            <th class="h-11 px-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">SSL</th>
+            <th class="h-11 px-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Expires</th>
+            <th class="h-11 px-6 w-10"></th>
+          </tr>
+        </thead>
+        <tbody class="[&_tr:last-child]:border-0">
+          <tr class="border-b hover:bg-muted/40">
+            <td class="px-6 py-3"><code class="text-sm">gangnam-academy.kr</code></td>
+            <td class="px-4 py-3">Gangnam HQ Branch</td>
+            <td class="px-4 py-3"><span class="inline-flex items-center rounded-full border-transparent bg-emerald-100 text-emerald-700 px-2.5 py-0.5 text-xs font-medium">Active</span></td>
+            <td class="px-4 py-3 text-muted-foreground">in 312 days</td>
+            <td class="px-6 py-3 text-right"><button class="h-8 w-8 grid place-items-center rounded-md hover:bg-accent text-muted-foreground"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></td>
+          </tr>
+          <tr class="border-b hover:bg-muted/40">
+            <td class="px-6 py-3"><code class="text-sm">jamsil-academy.kr</code></td>
+            <td class="px-4 py-3">Jamsil Academy</td>
+            <td class="px-4 py-3"><span class="inline-flex items-center rounded-full border-transparent bg-amber-100 text-amber-700 px-2.5 py-0.5 text-xs font-medium">Expiring</span></td>
+            <td class="px-4 py-3 text-muted-foreground">in 9 days</td>
+            <td class="px-6 py-3 text-right"><button class="h-8 w-8 grid place-items-center rounded-md hover:bg-accent text-muted-foreground"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></td>
+          </tr>
+          <tr class="hover:bg-muted/40">
+            <td class="px-6 py-3"><code class="text-sm">songpa-school.com</code></td>
+            <td class="px-4 py-3">Songpa Branch</td>
+            <td class="px-4 py-3"><span class="inline-flex items-center rounded-full border-transparent bg-destructive text-destructive-foreground px-2.5 py-0.5 text-xs font-medium">DNS failed</span></td>
+            <td class="px-4 py-3 text-muted-foreground">—</td>
+            <td class="px-6 py-3 text-right"><button class="h-8 w-8 grid place-items-center rounded-md hover:bg-accent text-muted-foreground"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-publishing">
+  <section>
+    <h1 class="text-2xl font-semibold tracking-tight">Publishing permissions</h1>
+    <p class="text-sm text-muted-foreground mt-1">Platform-level publishing gates. See <button data-nav="brand-status" class="text-primary hover:underline">Brand Site Status</button> for the live queue.</p>
+    <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="rounded-lg border bg-card shadow-sm p-6 space-y-4">
+        <div class="flex items-start justify-between"><div><div class="font-medium text-sm">Allow publishing platform-wide</div><div class="text-xs text-muted-foreground mt-0.5">Master switch for all branches.</div></div><span class="switch" data-on="true"></span></div>
+        <div class="flex items-start justify-between"><div><div class="font-medium text-sm">Require HQ approval before publish</div><div class="text-xs text-muted-foreground mt-0.5">All publishes route through HQ review.</div></div><span class="switch" data-on="true"></span></div>
+        <div class="flex items-start justify-between"><div><div class="font-medium text-sm">Auto-approve under change threshold</div><div class="text-xs text-muted-foreground mt-0.5">Trivial diffs (text-only, &lt; 50 chars) skip the queue.</div></div><span class="switch" data-on="false"></span></div>
+      </div>
+      <div class="rounded-lg border bg-card shadow-sm p-6">
+        <div class="text-base font-semibold">Default reviewer roster</div>
+        <div class="text-xs text-muted-foreground mt-0.5">HQ users notified when a branch submits for review.</div>
+        <div class="mt-4 space-y-2 text-sm">
+          <div class="flex items-center gap-3 rounded-md border px-3 py-2"><span class="h-7 w-7 rounded-full bg-muted grid place-items-center text-[11px] font-semibold text-muted-foreground">SK</span> Sangha Kim <span class="ml-auto text-xs text-muted-foreground">Platform admin</span></div>
+          <div class="flex items-center gap-3 rounded-md border px-3 py-2"><span class="h-7 w-7 rounded-full bg-muted grid place-items-center text-[11px] font-semibold text-muted-foreground">RK</span> Rachel Kang <span class="ml-auto text-xs text-muted-foreground">Content lead</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-storage">
+  <section>
+    <h1 class="text-2xl font-semibold tracking-tight">Storage usage</h1>
+    <p class="text-sm text-muted-foreground mt-1">Per-branch consumption against plan quotas.</p>
+    <div class="mt-6 rounded-lg border bg-card shadow-sm overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="[&_tr]:border-b"><tr>
+          <th class="h-11 px-6 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Branch</th>
+          <th class="h-11 px-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Plan</th>
+          <th class="h-11 px-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Used</th>
+          <th class="h-11 px-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Quota</th>
+          <th class="h-11 px-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Utilization</th>
+          <th class="h-11 px-6 w-10"></th>
+        </tr></thead>
+        <tbody>
+          <tr class="border-b"><td class="px-6 py-3 font-medium">Songpa Branch</td><td class="px-4 py-3">Pro</td><td class="px-4 py-3">5.4 GB</td><td class="px-4 py-3">5 GB</td><td class="px-4 py-3"><div class="flex items-center gap-2"><div class="h-1.5 w-32 rounded-full bg-muted overflow-hidden"><div class="h-full bg-destructive" style="width:108%"></div></div><span class="text-xs text-destructive font-medium">108%</span></div></td><td class="px-6 py-3 text-right"><button class="text-xs text-primary hover:underline">Top up</button></td></tr>
+          <tr class="border-b"><td class="px-6 py-3 font-medium">Mokdong Hagwon</td><td class="px-4 py-3">Pro</td><td class="px-4 py-3">4.8 GB</td><td class="px-4 py-3">5 GB</td><td class="px-4 py-3"><div class="flex items-center gap-2"><div class="h-1.5 w-32 rounded-full bg-muted overflow-hidden"><div class="h-full bg-amber-500" style="width:96%"></div></div><span class="text-xs text-amber-700 font-medium">96%</span></div></td><td class="px-6 py-3 text-right"><button class="text-xs text-primary hover:underline">Top up</button></td></tr>
+          <tr class="border-b"><td class="px-6 py-3 font-medium">Gangnam HQ Branch</td><td class="px-4 py-3">Business</td><td class="px-4 py-3">3.2 GB</td><td class="px-4 py-3">5 GB</td><td class="px-4 py-3"><div class="flex items-center gap-2"><div class="h-1.5 w-32 rounded-full bg-muted overflow-hidden"><div class="h-full bg-primary" style="width:64%"></div></div><span class="text-xs">64%</span></div></td><td class="px-6 py-3 text-right"></td></tr>
+          <tr><td class="px-6 py-3 font-medium">Bundang STEM</td><td class="px-4 py-3">Business</td><td class="px-4 py-3">1.1 GB</td><td class="px-4 py-3">5 GB</td><td class="px-4 py-3"><div class="flex items-center gap-2"><div class="h-1.5 w-32 rounded-full bg-muted overflow-hidden"><div class="h-full bg-primary" style="width:22%"></div></div><span class="text-xs">22%</span></div></td><td class="px-6 py-3"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-stub">
+  <section>
+    <h1 class="text-2xl font-semibold tracking-tight" data-stub-title>Page</h1>
+    <p class="text-sm text-muted-foreground mt-1" data-stub-sub>Stubbed for this mockup; full design lives in HQ_Admin_Design_Spec.md.</p>
+    <div class="mt-6 rounded-lg border border-dashed bg-muted/20 px-6 py-12">
+      <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-12 lg:col-span-8 space-y-3">
+          <div class="h-5 w-1/3 rounded shimmer"></div>
+          <div class="h-3 w-2/3 rounded shimmer"></div>
+          <div class="h-3 w-3/4 rounded shimmer"></div>
+          <div class="h-32 rounded shimmer mt-3"></div>
+        </div>
+        <div class="col-span-12 lg:col-span-4 space-y-3">
+          <div class="h-24 rounded shimmer"></div>
+          <div class="h-24 rounded shimmer"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<!-- ============== APP DATA + SCRIPT ============== -->
+<script>
+  // Branch list mock data
+  const BRANCHES = [
+    { name:"Gangnam HQ Branch",        city:"Seoul",     enabled:true,  plan:"business",   pub:"published",         domain:"gangnam-academy.kr",  ssl:"active",  used:3.2,  max:5,   updated:"2 h ago",     logo:"G", from:"from-primary",        to:"to-sky-500"},
+    { name:"Songpa Branch",            city:"Seoul",     enabled:true,  plan:"pro",        pub:"published",         domain:"songpa-school.com",   ssl:"failed",  used:5.4,  max:5,   updated:"1 h ago",     logo:"S", from:"from-violet-400",     to:"to-rose-500"},
+    { name:"Hongdae Language Center",  city:"Seoul",     enabled:true,  plan:"pro",        pub:"under_review",      domain:"hongdae-lang.co.kr",  ssl:"active",  used:2.1,  max:5,   updated:"38 m ago",    logo:"H", from:"from-sky-400",        to:"to-violet-500"},
+    { name:"Bundang STEM",             city:"Seongnam",  enabled:true,  plan:"business",   pub:"changes_requested", domain:"bundangstem.kr",      ssl:"active",  used:1.1,  max:5,   updated:"5 h ago",     logo:"B", from:"from-emerald-400",    to:"to-sky-500"},
+    { name:"Jamsil Academy",           city:"Seoul",     enabled:true,  plan:"pro",        pub:"under_review",      domain:"jamsil-academy.kr",   ssl:"active",  used:2.7,  max:5,   updated:"2 h ago",     logo:"J", from:"from-amber-400",      to:"to-rose-500"},
+    { name:"Mokdong Hagwon",           city:"Seoul",     enabled:true,  plan:"pro",        pub:"published",         domain:"—",                   ssl:"none",    used:4.8,  max:5,   updated:"yesterday",   logo:"M", from:"from-rose-400",       to:"to-amber-500"},
+    { name:"Daejeon Math Hagwon",      city:"Daejeon",   enabled:false, plan:"free",       pub:"draft",             domain:"—",                   ssl:"none",    used:0.2,  max:1,   updated:"3 d ago",     logo:"D", from:"from-muted",          to:"to-muted"},
+    { name:"Busan Sea Academy",        city:"Busan",     enabled:true,  plan:"enterprise", pub:"published",         domain:"busanacademy.com",    ssl:"active",  used:18.4, max:50,  updated:"4 h ago",     logo:"B", from:"from-sky-500",        to:"to-emerald-500"},
+    { name:"Ilsan Bright Kids",        city:"Goyang",    enabled:true,  plan:"pro",        pub:"scheduled",         domain:"ilsanbrightkids.kr",  ssl:"active",  used:0.9,  max:5,   updated:"1 d ago",     logo:"I", from:"from-amber-300",      to:"to-emerald-400"},
+    { name:"Suwon Coding Lab",         city:"Suwon",     enabled:false, plan:"free",       pub:"draft",             domain:"—",                   ssl:"none",    used:0.0,  max:1,   updated:"7 d ago",     logo:"S", from:"from-muted",          to:"to-muted"},
+  ];
+
+  const planVariant = {
+    free:       { cls: "bg-muted text-muted-foreground",     label: "Free" },
+    pro:        { cls: "bg-sky-100 text-sky-700",            label: "Pro" },
+    business:   { cls: "bg-violet-100 text-violet-700",      label: "Business" },
+    enterprise: { cls: "bg-primary text-primary-foreground", label: "Enterprise" },
+  };
+  const pubVariant = {
+    published:         { cls: "bg-emerald-100 text-emerald-700",          label: "Published" },
+    draft:             { cls: "bg-muted text-muted-foreground",           label: "Draft" },
+    under_review:      { cls: "bg-sky-100 text-sky-700",                  label: "Under review" },
+    changes_requested: { cls: "bg-amber-100 text-amber-700",              label: "Changes requested" },
+    scheduled:         { cls: "bg-violet-100 text-violet-700",            label: "Scheduled" },
+    suspended:         { cls: "bg-destructive text-destructive-foreground", label: "Suspended" },
+  };
+  const sslVariant = {
+    active:  { cls: "bg-emerald-100 text-emerald-700",        label: "SSL" },
+    failed:  { cls: "bg-destructive text-destructive-foreground", label: "DNS" },
+    none:    { cls: "bg-muted text-muted-foreground",         label: "—" },
+  };
+
+  function pct(n, m) { return Math.min(100, Math.round((n/m)*100)); }
+  function meterColor(p) {
+    if (p >= 100) return "bg-destructive";
+    if (p >= 90)  return "bg-amber-500";
+    return "bg-primary";
+  }
+
+  function renderBranchRows() {
+    const tbody = document.getElementById("branch-tbody");
+    if (!tbody) return;
+    tbody.innerHTML = BRANCHES.map((b, i) => {
+      const p   = pct(b.used, b.max);
+      const pv  = pubVariant[b.pub];
+      const plv = planVariant[b.plan];
+      const ssl = sslVariant[b.ssl];
+      return `
+        <tr class="border-b hover:bg-muted/40" data-row="${i}">
+          <td class="px-4 py-3 align-middle">
+            <input type="checkbox" data-row-check class="h-4 w-4 rounded border-border" />
+          </td>
+          <td class="px-4 py-3 align-middle">
+            <div class="flex items-center gap-3">
+              <div class="h-8 w-8 rounded-md bg-gradient-to-br ${b.from} ${b.to} text-white grid place-items-center text-xs font-semibold shrink-0">${b.logo}</div>
+              <div class="min-w-0">
+                <button data-nav="branch-detail" class="font-medium text-sm truncate hover:underline text-left">${b.name}</button>
+                <div class="text-xs text-muted-foreground truncate">${b.city}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3 align-middle">
+            <div class="flex items-center gap-2">
+              <span class="switch" data-on="${b.enabled}" role="switch" aria-checked="${b.enabled}"></span>
+              <span class="text-xs ${b.enabled ? 'text-foreground' : 'text-muted-foreground'}">${b.enabled ? 'Enabled' : 'Disabled'}</span>
+            </div>
+          </td>
+          <td class="px-4 py-3 align-middle">
+            <span class="inline-flex items-center rounded-full border-transparent ${plv.cls} px-2.5 py-0.5 text-xs font-medium">${plv.label}</span>
+          </td>
+          <td class="px-4 py-3 align-middle">
+            <span class="inline-flex items-center rounded-full border-transparent ${pv.cls} px-2.5 py-0.5 text-xs font-medium">${pv.label}</span>
+          </td>
+          <td class="px-4 py-3 align-middle">
+            <div class="flex items-center gap-2">
+              <code class="text-xs ${b.domain === '—' ? 'text-muted-foreground' : ''}">${b.domain}</code>
+              ${b.domain === '—' ? '' : `<span class="inline-flex items-center rounded-full border-transparent ${ssl.cls} px-1.5 py-0 text-[10px] font-medium uppercase tracking-wide">${ssl.label}</span>`}
+            </div>
+          </td>
+          <td class="px-4 py-3 align-middle">
+            <div class="flex items-center gap-2 min-w-[140px]">
+              <div class="h-1.5 w-24 rounded-full bg-muted overflow-hidden">
+                <div class="h-full ${meterColor(p)}" style="width:${Math.min(100,p)}%"></div>
+              </div>
+              <span class="text-xs ${p>=90 ? 'text-destructive font-medium' : 'text-muted-foreground'}">${b.used} / ${b.max} GB</span>
+            </div>
+          </td>
+          <td class="px-4 py-3 align-middle text-sm text-muted-foreground">${b.updated}</td>
+          <td class="px-4 py-3 align-middle text-right">
+            <button class="ring-ds h-8 w-8 grid place-items-center rounded-md hover:bg-accent text-muted-foreground" data-row-menu="${i}" title="Actions">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    // Wire row checkboxes -> bulk tray
+    const tray = document.getElementById("bulk-tray");
+    const count = document.getElementById("bulk-count");
+    const checkboxes = tbody.querySelectorAll("[data-row-check]");
+    function refreshTray() {
+      const sel = tbody.querySelectorAll('[data-row-check]:checked').length;
+      if (count) count.textContent = sel;
+      if (tray)  tray.classList.toggle("hidden", sel === 0);
+      tbody.querySelectorAll("tr").forEach(tr => {
+        const c = tr.querySelector('[data-row-check]');
+        tr.dataset.selected = c && c.checked ? "true" : "false";
+      });
+    }
+    checkboxes.forEach(c => c.addEventListener("change", refreshTray));
+    const selectAll = document.getElementById("select-all");
+    if (selectAll) selectAll.addEventListener("change", (e) => {
+      checkboxes.forEach(c => { c.checked = e.target.checked; });
+      refreshTray();
+    });
+
+    // Wire row context menu (just toast for demo)
+    tbody.querySelectorAll("[data-row-menu]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        toast("Row menu would offer: View detail · Suspend site · Change plan · Assign template.");
+      });
+    });
+  }
+
+  // Page switching
+  const PAGES = {
+    "dashboard":     { tpl: "tpl-dashboard",     crumb: ["HQ", "Dashboard"] },
+    "branches":      { tpl: "tpl-branches",      crumb: ["HQ", "Branches"], onMount: renderBranchRows },
+    "branch-detail": { tpl: "tpl-branch-detail", crumb: ["HQ", "Branches", "Gangnam HQ Branch"] },
+    "permissions":   { tpl: "tpl-permissions",   crumb: ["HQ", "Branches", "User permissions"] },
+    "brand-status":  { tpl: "tpl-brand-status",  crumb: ["HQ", "Brand site", "Status"] },
+    "templates":     { tpl: "tpl-templates",     crumb: ["HQ", "Brand site", "Templates"] },
+    "domains":       { tpl: "tpl-domains",       crumb: ["HQ", "Brand site", "Domains"] },
+    "publishing":    { tpl: "tpl-publishing",    crumb: ["HQ", "Brand site", "Publishing"] },
+    "storage":       { tpl: "tpl-storage",       crumb: ["HQ", "Brand site", "Storage"] },
+    "plans":         { tpl: "tpl-stub",          crumb: ["HQ", "Billing", "Plans"],         stubTitle: "Plan management",       stubSub: "Define and price plan tiers (Free / Pro / Business / Enterprise). Stubbed in this mockup; full spec in HQ_Admin_Design_Spec.md." },
+    "features":      { tpl: "tpl-stub",          crumb: ["HQ", "Billing", "Feature access"], stubTitle: "Feature access",        stubSub: "Toggle feature flags per plan. Stubbed in this mockup." },
+    "payments":      { tpl: "tpl-stub",          crumb: ["HQ", "Billing", "Payments"],      stubTitle: "Payment status",        stubSub: "Invoice history, retries, dunning. Stubbed in this mockup." },
+    "global":        { tpl: "tpl-stub",          crumb: ["HQ", "Settings", "Global"],       stubTitle: "Global settings",       stubSub: "Time zones, locale defaults, brand identity for HQ surface itself." },
+    "notifications": { tpl: "tpl-stub",          crumb: ["HQ", "Settings", "Notifications"],stubTitle: "Notification settings", stubSub: "Email/Slack alerts for HQ events (publish requests, payment failures)." },
+    "defaults":      { tpl: "tpl-stub",          crumb: ["HQ", "Settings", "Template defaults"], stubTitle: "Template defaults", stubSub: "Default template per academy category." },
+  };
+
+  function setActive(navKey) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-active'));
+    document.querySelectorAll(`.nav-item[data-nav="${navKey}"]`).forEach(el => el.classList.add('nav-active'));
+  }
+
+  function setBreadcrumb(parts) {
+    const bc = document.getElementById("breadcrumb");
+    if (!bc) return;
+    bc.innerHTML = parts.map((p, i) => {
+      const isLast = i === parts.length - 1;
+      return `<span class="${isLast ? 'text-foreground' : ''}">${p}</span>${isLast ? '' : '<span class="text-border">/</span>'}`;
+    }).join("");
+  }
+
+  function go(navKey) {
+    const def = PAGES[navKey] || PAGES.dashboard;
+    const tpl = document.getElementById(def.tpl);
+    const root = document.getElementById("page-root");
+    root.innerHTML = "";
+    const node = tpl.content.cloneNode(true);
+    root.appendChild(node);
+    if (def.tpl === "tpl-stub") {
+      const t = root.querySelector("[data-stub-title]"); if (t) t.textContent = def.stubTitle || "Page";
+      const s = root.querySelector("[data-stub-sub]");   if (s) s.textContent = def.stubSub   || "";
+    }
+    setActive(navKey);
+    setBreadcrumb(def.crumb);
+    if (def.onMount) def.onMount();
+    // Wire newly-rendered switches and tabs
+    wireInteractive(root);
+    // Scroll to top
+    window.scrollTo({top: 0, behavior: 'instant'});
+  }
+
+  function wireInteractive(scope = document) {
+    // Switches toggle
+    scope.querySelectorAll('.switch').forEach(s => {
+      if (s.dataset._wired) return;
+      s.dataset._wired = "1";
+      s.addEventListener('click', () => {
+        s.dataset.on = s.dataset.on === "true" ? "false" : "true";
+        s.setAttribute('aria-checked', s.dataset.on);
+      });
+    });
+    // Tabs (within a tab strip — siblings inside same parent)
+    scope.querySelectorAll('.tab').forEach(t => {
+      if (t.dataset._wired) return;
+      t.dataset._wired = "1";
+      t.addEventListener('click', () => {
+        t.parentElement.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected','false'));
+        t.setAttribute('aria-selected','true');
+      });
+    });
+    // Sub-nav inside content
+    scope.querySelectorAll('[data-nav]').forEach(b => {
+      if (b.dataset._wired) return;
+      b.dataset._wired = "1";
+      b.addEventListener('click', () => go(b.dataset.nav));
+    });
+    // Modal openers
+    scope.querySelectorAll('[data-open-modal]').forEach(b => {
+      if (b.dataset._wired) return;
+      b.dataset._wired = "1";
+      b.addEventListener('click', () => {
+        const id = b.dataset.openModal;
+        const m = document.getElementById(id);
+        if (m && typeof m.showModal === "function") m.showModal();
+      });
+    });
+  }
+
+  // Toasts
+  function toast(msg, kind = "default") {
+    const host = document.getElementById("toast-host");
+    const t = document.createElement("div");
+    t.className = "rounded-md border bg-card text-card-foreground shadow-lg px-4 py-3 text-sm flex items-center gap-3 min-w-[280px] max-w-md";
+    t.innerHTML = `
+      <div class="h-6 w-6 rounded-md ${kind==='destructive' ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'} grid place-items-center">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="flex-1">${msg}</div>
+      <button class="text-muted-foreground hover:text-foreground" aria-label="Dismiss">×</button>
+    `;
+    t.querySelector('button').addEventListener('click', () => t.remove());
+    host.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+  }
+
+  // Wire global once
+  function wireGlobal() {
+    // Sidebar nav
+    document.querySelectorAll('aside [data-nav]').forEach(b => {
+      b.addEventListener('click', () => go(b.dataset.nav));
+    });
+    // Modal close (any [data-close-modal])
+    document.addEventListener('click', (e) => {
+      const t = e.target.closest('[data-close-modal]');
+      if (t) {
+        const dlg = t.closest('dialog');
+        if (dlg) dlg.close();
+      }
+    });
+    // Suspend modal — enable button only when phrase typed
+    const input = document.getElementById('suspend-confirm');
+    const go_ = document.getElementById('suspend-go');
+    if (input && go_) {
+      input.addEventListener('input', () => { go_.disabled = input.value.trim().toUpperCase() !== "SUSPEND"; });
+      go_.addEventListener('click', () => {
+        document.getElementById('modal-suspend').close();
+        toast("Brand site suspended for Gangnam HQ Branch.", "destructive");
+        input.value = ""; go_.disabled = true;
+      });
+    }
+  }
+
+  // Boot
+  document.addEventListener('DOMContentLoaded', () => {
+    wireGlobal();
+    go('dashboard');
+  });
+</script>
+
+</body>
+</html>

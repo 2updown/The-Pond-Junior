@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>HCIS OS — Mobile App</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root {
+  --ios-bg: #f2f2f7;
+  --ios-grouped-bg: #f2f2f7;
+  --ios-card: #ffffff;
+  --ios-card-2: #f9f9fb;
+  --ios-separator: rgba(60,60,67,.12);
+  --ios-text: #000;
+  --ios-text-2: #3c3c43;
+  --ios-text-3: rgba(60,60,67,.6);
+  --ios-text-4: rgba(60,60,67,.3);
+  --ios-blue: #007aff;
+  --ios-green: #34c759;
+  --ios-red: #ff3b30;
+  --ios-orange: #ff9500;
+  --ios-yellow: #ffcc00;
+  --ios-purple: #af52de;
+  --ios-gray: #8e8e93;
+  --ios-fill: rgba(120,120,128,.12);
+  --ios-fill-2: rgba(120,120,128,.16);
+  --safe-bottom: env(safe-area-inset-bottom, 0);
+  --safe-top: env(safe-area-inset-top, 0);
+  --tabbar-h: 56px;
+  --topbar-h: 44px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Pretendard", sans-serif;
+  background: var(--ios-bg);
+  color: var(--ios-text);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.mi {
+  font-family: 'Material Icons';
+  font-size: 20px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* LOGIN SCREEN */
+#login-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 32px 24px;
+  background: var(--ios-bg);
+  z-index: 999;
+}
+
+#login-screen.hidden {
+  display: none !important;
+}
+
+.login-logo {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--ios-text);
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: var(--ios-text-3);
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.login-button {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--ios-separator);
+  border-radius: 12px;
+  background: var(--ios-card);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ios-blue);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.login-button:active {
+  background: var(--ios-card-2);
+}
+
+/* APP SHELL */
+#app-shell {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+#app-shell.visible {
+  display: flex !important;
+}
+
+/* TOP NAV BAR */
+.ios-topbar {
+  position: sticky;
+  top: 0;
+  height: var(--topbar-h);
+  background: rgba(248, 248, 248, 0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid var(--ios-separator);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  z-index: 99;
+}
+
+.ios-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ios-hamburger {
+  width: 32px;
+  height: 32px;
+  background: var(--ios-fill);
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--ios-text);
+}
+
+.ios-topbar-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ios-text);
+}
+
+.ios-topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ios-avatar-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ios-blue);
+  color: white;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* DRAWER / SIDEBAR */
+.ios-drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 198;
+}
+
+.ios-drawer-overlay.open {
+  display: block;
+}
+
+.ios-drawer {
+  position: fixed;
+  left: -280px;
+  top: 0;
+  width: 280px;
+  height: 100%;
+  background: var(--ios-card);
+  border-right: 0.5px solid var(--ios-separator);
+  overflow-y: auto;
+  transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 199;
+}
+
+.ios-drawer.open {
+  left: 0;
+}
+
+.ios-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--safe-top) + 12px) 16px 12px;
+  border-bottom: 0.5px solid var(--ios-separator);
+}
+
+.ios-drawer-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ios-text);
+}
+
+.ios-drawer-close {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--ios-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ios-drawer-section {
+  padding: 16px 0;
+  border-bottom: 0.5px solid var(--ios-separator);
+}
+
+.ios-drawer-section:last-child {
+  border-bottom: none;
+}
+
+.ios-drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--ios-text-2);
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.ios-drawer-item:active {
+  background: var(--ios-fill);
+}
+
+.ios-drawer-item.divider {
+  height: 0.5px;
+  background: var(--ios-separator);
+  padding: 0;
+  cursor: default;
+  margin: 4px 0;
+}
+
+.ios-drawer-item.active {
+  color: var(--ios-blue);
+  font-weight: 600;
+}
+
+.ios-drawer-icon {
+  width: 28px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.ios-drawer-label {
+  flex: 1;
+}
+
+.ios-role-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.ios-role-badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--ios-fill);
+  color: var(--ios-text-3);
+}
+
+.ios-role-toggle {
+  width: 44px;
+  height: 28px;
+  border-radius: 14px;
+  border: none;
+  background: var(--ios-fill);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.3s;
+}
+
+.ios-role-toggle.active {
+  background: var(--ios-green);
+}
+
+.ios-role-toggle::after {
+  content: '';
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-radius: 13px;
+  background: white;
+  top: 1px;
+  left: 1px;
+  transition: left 0.3s;
+}
+
+.ios-role-toggle.active::after {
+  left: 17px;
+}
+
+/* MAIN CONTENT AREA */
+.ios-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0 calc(var(--tabbar-h) + var(--safe-bottom) + 16px) 0;
+  padding-top: 16px;
+}
+
+.ios-section {
+  display: none;
+}
+
+.ios-section.active {
+  display: block;
+  animation: fadeInUp 0.25s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* PAGE STRUCTURE */
+.ios-page-header {
+  padding: 0 16px 12px;
+}
+
+.ios-large-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--ios-text);
+  margin: 0;
+}
+
+.ios-page-subtitle {
+  font-size: 13px;
+  color: var(--ios-text-3);
+  margin: 4px 0 0;
+}
+
+/* CARDS & LISTS */
+.ios-card {
+  background: var(--ios-card);
+  border-radius: 12px;
+  margin: 8px 16px;
+  overflow: hidden;
+  border: 0.5px solid var(--ios-separator);
+}
+
+.ios-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ios-text-3);
+  padding: 12px 16px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ios-list {
+  background: var(--ios-card);
+  border-radius: 12px;
+  margin: 8px 16px;
+  overflow: hidden;
+  border: 0.5px solid var(--ios-separator);
+}
+
+.ios-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  min-height: 44px;
+  border-bottom: 0.5px solid var(--ios-separator);
+}
+
+.ios-row:last-child {
+  border-bottom: none;
+}
+
+.ios-row-tappable {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ios-row-tappable:active {
+  background: var(--ios-fill);
+}
+
+.ios-row-icon {
+  width: 24px;
+  text-align: center;
+  font-size: 18px;
+  color: var(--ios-text-3);
+}
+
+.ios-row-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ios-row-label {
+  font-size: 16px;
+  color: var(--ios-text);
+  margin: 0;
+}
+
+.ios-row-detail {
+  font-size: 13px;
+  color: var(--ios-text-3);
+  margin: 2px 0 0;
+}
+
+.ios-row-chevron {
+  color: var(--ios-text-4);
+  font-size: 18px;
+}
+
+/* BUTTONS */
+.ios-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.ios-button-primary {
+  background: var(--ios-blue);
+  color: white;
+}
+
+.ios-button-primary:active {
+  opacity: 0.7;
+}
+
+.ios-button-secondary {
+  background: var(--ios-fill);
+  color: var(--ios-text);
+}
+
+.ios-button-secondary:active {
+  background: var(--ios-fill-2);
+}
+
+.ios-button-danger {
+  background: var(--ios-red);
+  color: white;
+}
+
+.ios-button-danger:active {
+  opacity: 0.7;
+}
+
+.ios-button-block {
+  width: 100%;
+  padding: 12px 16px;
+}
+
+/* FORMS */
+.ios-form-group {
+  margin-bottom: 16px;
+}
+
+.ios-form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-text);
+  margin-bottom: 6px;
+}
+
+.ios-form-input,
+.ios-form-select,
+.ios-form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--ios-separator);
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--ios-text);
+  background: var(--ios-card);
+}
+
+.ios-form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.ios-form-input:focus,
+.ios-form-select:focus,
+.ios-form-textarea:focus {
+  outline: none;
+  border-color: var(--ios-blue);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+/* BOTTOM TAB BAR */
+.ios-tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--tabbar-h) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: rgba(248, 248, 248, 0.85);
+  backdrop-filter: blur(20px);
+  border-top: 0.5px solid var(--ios-separator);
+  display: flex;
+  z-index: 100;
+}
+
+.ios-tabbar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--ios-gray);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+
+.ios-tabbar-item.active {
+  color: var(--ios-blue);
+}
+
+.ios-tabbar-icon {
+  font-size: 24px;
+}
+
+.ios-tabbar-label {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* MODALS */
+.ios-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  animation: fadeIn 0.2s ease;
+}
+
+.ios-modal-overlay.open {
+  display: flex;
+  align-items: flex-end;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ios-modal {
+  width: 100%;
+  background: var(--ios-card);
+  border-radius: 16px 16px 0 0;
+  padding: 16px;
+  animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding-bottom: calc(16px + var(--safe-bottom));
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.ios-modal-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ios-text-4);
+  margin: 8px auto 16px;
+}
+
+.ios-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.ios-modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ios-text);
+}
+
+.ios-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ios-fill);
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--ios-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SEGMENTED CONTROL */
+.ios-segmented {
+  display: inline-flex;
+  background: var(--ios-fill);
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.ios-segmented-item {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-gray);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.ios-segmented-item.active {
+  background: var(--ios-card);
+  color: var(--ios-text);
+}
+
+/* BADGES & TAGS */
+.ios-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--ios-red);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ios-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--ios-fill);
+  color: var(--ios-text-3);
+}
+
+.tag.green { background: var(--ios-green); color: white; }
+.tag.red { background: var(--ios-red); color: white; }
+.tag.blue { background: var(--ios-blue); color: white; }
+.tag.orange { background: var(--ios-orange); color: white; }
+
+/* RESPONSIVE */
+@media (min-width: 769px) {
+  #login-screen {
+    display: none !important;
+  }
+
+  #app-shell {
+    display: flex !important;
+  }
+
+  .ios-tabbar {
+    display: none !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-logo">HCIS</div>
+  <div class="login-subtitle">학원 관리 시스템에 로그인하세요</div>
+  <button class="login-button" onclick="selectRole('hq')">본사 관리자</button>
+  <button class="login-button" onclick="selectRole('teacher')">선생님</button>
+  <button class="login-button" onclick="selectRole('parent')">학부모</button>
+</div>
+
+<!-- APP SHELL -->
+<div id="app-shell">
+  <!-- TOP BAR -->
+  <div class="ios-topbar">
+    <div class="ios-topbar-left">
+      <button class="ios-hamburger" onclick="toggleDrawer()">
+        <span class="mi">menu</span>
+      </button>
+      <div class="ios-topbar-title" id="topbar-title">홈</div>
+    </div>
+    <div class="ios-topbar-right">
+      <button class="ios-avatar-btn" onclick="toggleDrawer()">HQ</button>
+    </div>
+  </div>
+
+  <!-- DRAWER OVERLAY -->
+  <div class="ios-drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+
+  <!-- DRAWER -->
+  <nav class="ios-drawer" id="drawer">
+    <div class="ios-drawer-header">
+      <div class="ios-drawer-title">메뉴</div>
+      <button class="ios-drawer-close" onclick="closeDrawer()">
+        <span class="mi">close</span>
+      </button>
+    </div>
+
+    <div id="drawer-content" class="ios-drawer-content">
+      <!-- Content injected per role -->
+    </div>
+
+    <div class="ios-drawer-section">
+      <button class="ios-drawer-item" onclick="logout()">
+        <span class="ios-drawer-icon mi">logout</span>
+        <span class="ios-drawer-label">로그아웃</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="ios-main" id="main-content">
+    <!-- Page sections injected per role -->
+  </div>
+
+  <!-- BOTTOM TAB BAR -->
+  <div class="ios-tabbar" id="tabbar">
+    <!-- Tab items injected per role -->
+  </div>
+</div>
+
+<!-- SHARED MODALS LAYER -->
+<div id="modal-layer">
+  <!-- Modals injected per role -->
+</div>
+
+<!-- SHARED SCRIPTS -->
+<script>
+// ===== ROLE STATE =====
+let currentRole = null;
+let currentTeacherAdminMode = false;
+let currentSection = 'home';
+
+// ===== SEED DATA - HQ =====
+var hq_branchData = [
+  {name:'강남 센터', tel:'02-1234-5678', addr:'서울 강남구 테헤란로 123', managers:3, students:18, status:'운영 중'},
+  {name:'서초 센터', tel:'02-2345-6789', addr:'서울 서초구 서초대로 456', managers:2, students:14, status:'운영 중'},
+  {name:'송파 센터', tel:'02-3456-7890', addr:'서울 송파구 올림픽로 789', managers:3, students:10, status:'운영 중'},
+];
+
+// ===== SEED DATA - PARENT =====
+var parent_noticeContents = {
+  '6월 학부모 참관 수업 안내': '안녕하세요, HCIS 강남센터입니다.\n\n6월 학부모 참관 수업을 아래와 같이 안내드립니다.\n\n📅 일시: 2024년 6월 28일 (금) 오후 2시\n📍 장소: 강남 센터 각 반 교실\n\n참관 수업에서는 아이들의 수업 참여 모습과 학습 성과를 직접 확인하실 수 있습니다.\n\n참석 여부를 06월 24일까지 담임 선생님께 알려주시면 감사하겠습니다.',
+  '7월 방학 일정 안내': '안녕하세요, HCIS 강남센터입니다.\n\n7월 방학 일정을 안내드립니다.\n\n📅 방학 기간: 7월 22일(월) ~ 8월 4일(일) (2주)\n📅 개학일: 8월 5일(월)\n\n방학 중 자율 학습 자료는 앱을 통해 배포될 예정입니다. 감사합니다.',
+  '수업 준비물 안내': '안녕하세요, Earth반 담임 박지수 선생님입니다.\n\n다음 주 수업에 필요한 준비물을 안내드립니다.\n\n✏️ 준비물 목록:\n- A4 스케치북 1권\n- 색연필 또는 사인펜\n- 영어 단어장 (기존 사용하던 것)\n\n월요일 수업 시작 전까지 준비해 주시면 감사합니다.',
+  '6월 영어 말하기 대회 안내': '안녕하세요, HCIS 강남센터입니다.\n\n6월 영어 말하기 대회를 개최합니다!\n\n📅 대회 일정: 6월 21일 (금) 오후 3시\n📍 장소: 강남 센터 대강의실\n🏆 시상: 금·은·동상 및 참가상\n\n자유 주제로 2~3분 영어 스피치를 준비해 주세요. 많은 참여 바랍니다!'
+};
+
+var parent_diaryData = [
+  {id:1, title:'오늘의 학습: 영어 파닉스 3단원', date:'2024.06.17', teacher:'박지수 선생님', subject:'영어 파닉스 3단원 · 수학 기초 연산', body:'안녕하세요, 학부모님. Earth반 박지수 선생님입니다.\n\n오늘 수업 내용을 알려드립니다.\n\n📚 영어: 파닉스 3단원 "Short Vowel Sounds" 학습했습니다. 민준이가 발음에 많이 익숙해졌어요!\n\n📐 수학: 두 자리 수 덧셈·뺄셈 연산 복습을 진행했습니다.\n\n📝 숙제: 영어 단어 5개 써오기 (p.34)\n\n🎒 내일 준비물: 색연필, 노트북\n\n오늘도 열심히 참여한 민준이를 칭찬해 주세요. 감사합니다!'},
+  {id:2, title:'수학 Level B - 이번주 진도 공유', date:'2024.06.16', teacher:'박지수 선생님', subject:'수학 Level B 분수 개념', body:'안녕하세요, 학부모님. 오늘은 수학 Level B 분수의 기초 개념을 학습했습니다.\n\n분수의 의미와 간단한 분수 읽기/쓰기를 연습했습니다. 이번 주 내내 분수 단원을 진행할 예정입니다.\n\n📝 숙제: 수학 워크북 p.22~23 완성\n\n궁금한 점 있으시면 언제든지 연락 주세요!'},
+  {id:3, title:'이번주 필독도서 안내', date:'2024.06.14', teacher:'박지수 선생님', subject:'독서 / 국어', body:'안녕하세요, 학부모님.\n\n이번 주 필독도서를 안내드립니다.\n\n📖 필독도서: "Charlotte\'s Web" (샬롯의 거미줄) 1~3장\n\n책을 미리 읽어오면 수업에서 더 풍부한 토론을 할 수 있습니다. 가능하시면 주말 동안 함께 읽어봐 주세요!'},
+  {id:4, title:'6월 3주차 주간 학습 안내', date:'2024.06.12', teacher:'박지수 선생님', subject:'주간 전체 과목', body:'안녕하세요, 학부모님. 이번 주 학습 계획을 공유드립니다.\n\n📅 월: 영어 - 파닉스 복습\n📅 화: 수학 - 분수 기초\n📅 수: 영어 - 읽기 훈련\n📅 목: 수학 - 분수 심화\n📅 금: 종합 복습 및 퀴즈\n\n퀴즈 전날 복습을 꼭 챙겨주시면 감사합니다!'}
+];
+
+// ===== SEED DATA - FRANCHISE =====
+const franchise_students = [
+  { name:'유다인',  link:true,  grade:'초5학년', contact:'01040000008', branch:'본점', group:'Forest', teacher:'-',     counseled:true,  paid:'완납',  graduated:false },
+  { name:'장하늘',  link:true,  grade:'중1학년', contact:'01040000010', branch:'본점', group:'Forest', teacher:'-',     counseled:true,  paid:'완납',  graduated:false },
+  { name:'김서준',  link:false, grade:'초5학년', contact:'01040000001', branch:'본점', group:'Forest', teacher:'-',     counseled:true,  paid:'미납',  graduated:false },
+  { name:'오예준',  link:false, grade:'초6학년', contact:'01040000007', branch:'본점', group:'Forest', teacher:'-',     counseled:true,  paid:'완납',  graduated:false },
+  { name:'이하윤',  link:false, grade:'초4학년', contact:'01040000002', branch:'본점', group:'Forest', teacher:'최지혜쌤', counseled:true,  paid:'미납',  graduated:false },
+  { name:'최서연',  link:true,  grade:'중2학년', contact:'01040000004', branch:'본점', group:'Forest', teacher:'-',     counseled:true,  paid:'완납',  graduated:false },
+  { name:'한지우',  link:false, grade:'중3학년', contact:'01040000006', branch:'본점', group:'Forest', teacher:'-',     counseled:true,  paid:'완납',  graduated:false },
+  { name:'정민서',  link:true,  grade:'초3학년', contact:'01040000003', branch:'본점', group:'Earth', teacher:'박지수쌤', counseled:false, paid:'완납',  graduated:false },
+  { name:'윤채은',  link:false, grade:'초2학년', contact:'01040000005', branch:'본점', group:'Earth', teacher:'-',     counseled:false, paid:'독촉중', graduated:false },
+  { name:'강도윤',  link:false, grade:'중1학년', contact:'01040000009', branch:'본점', group:'Light', teacher:'이수민쌤', counseled:false, paid:'완납',  graduated:false },
+  { name:'임소율',  link:false, grade:'초6학년', contact:'01040000011', branch:'본점', group:'Forest', teacher:'-',     counseled:false, paid:'완납',  graduated:true  },
+  { name:'박준혁',  link:false, grade:'중2학년', contact:'01040000012', branch:'본점', group:'Light', teacher:'이수민쌤', counseled:false, paid:'완납',  graduated:true  },
+];
+
+let franchise_payFilter = 'all';
+
+// ===== AUTH =====
+function selectRole(role) {
+  currentRole = role;
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-shell').classList.add('visible');
+  initializeRoleApp(role);
+}
+
+function logout() {
+  currentRole = null;
+  currentTeacherAdminMode = false;
+  document.getElementById('app-shell').classList.remove('visible');
+  document.getElementById('login-screen').classList.remove('hidden');
+  closeDrawer();
+}
+
+function initializeRoleApp(role) {
+  const content = document.getElementById('drawer-content');
+  const tabbar = document.getElementById('tabbar');
+  const main = document.getElementById('main-content');
+  const modalLayer = document.getElementById('modal-layer');
+
+  content.innerHTML = '';
+  tabbar.innerHTML = '';
+  main.innerHTML = '';
+  modalLayer.innerHTML = '';
+
+  if (role === 'hq') {
+    initHQApp();
+  } else if (role === 'teacher') {
+    initTeacherApp();
+  } else if (role === 'parent') {
+    initParentApp();
+  }
+}
+
+// ===== HQ FUNCTIONS =====
+function hq_nav(id) {
+  document.querySelectorAll('#main-content .ios-section').forEach(s => {
+    s.classList.toggle('active', s.id === 'hq-' + id);
+  });
+  const titles = { home: '홈', branch: '지점 관리', account: '계정 관리', settings: '기본 설정' };
+  document.getElementById('topbar-title').textContent = titles[id];
+  document.querySelectorAll('.ios-tabbar-item').forEach(t => t.classList.remove('active'));
+  document.querySelector('[data-page="hq-' + id + '"]')?.classList.add('active');
+  closeDrawer();
+}
+
+function hq_openBranchDetail(name) {
+  var b = hq_branchData.find(function(x){return x.name===name;});
+  if(!b) return;
+  var html = '<div style="padding:16px;"><div style="font-size:18px;font-weight:700;margin-bottom:16px;">' + b.name + '</div>'
+    + '<div style="background:var(--ios-fill);border-radius:10px;padding:12px;margin-bottom:12px;">'
+    + '<div style="display:flex;padding:6px 0;font-size:13px;"><div style="flex:1;">연락처</div><div style="font-weight:600;">'+ b.tel +'</div></div>'
+    + '<div style="display:flex;padding:6px 0;font-size:13px;"><div style="flex:1;">주소</div><div style="font-weight:600;">'+ b.addr +'</div></div>'
+    + '<div style="display:flex;padding:6px 0;font-size:13px;"><div style="flex:1;">관리자</div><div style="font-weight:600;">'+ b.managers +'명</div></div>'
+    + '<div style="display:flex;padding:6px 0;font-size:13px;"><div style="flex:1;">학생</div><div style="font-weight:600;">'+ b.students +'명</div></div>'
+    + '<div style="display:flex;padding:6px 0;font-size:13px;"><div style="flex:1;">상태</div><div><span class="tag green">'+ b.status +'</span></div></div>'
+    + '</div><div style="display:flex;gap:8px;margin-top:16px;">'
+    + '<button class="ios-button ios-button-secondary" style="flex:1;" onclick="closeHQModal()">닫기</button>'
+    + '</div></div>';
+  document.getElementById('hq-modal-branch-detail-content').innerHTML = html;
+  document.getElementById('hq-modal-branch-detail').classList.add('open');
+}
+
+function hq_submitBranch() {
+  var name = document.getElementById('hq-new-branch-name').value.trim();
+  var tel  = document.getElementById('hq-new-branch-tel').value.trim();
+  if(!name){ alert('지점명을 입력하세요.'); return; }
+  if(!tel){ alert('연락처를 입력하세요.'); return; }
+  alert('✅ ' + name + ' 지점이 생성되었습니다.');
+  closeHQModal();
+  document.getElementById('hq-new-branch-name').value='';
+  document.getElementById('hq-new-branch-tel').value='';
+}
+
+function hq_filterAccount(type, btn) {
+  document.querySelectorAll('.hq-account-filter').forEach(b => b.classList.remove('ios-button-primary'));
+  btn.classList.add('ios-button-primary');
+}
+
+function hq_submitAccount() {
+  var name   = document.getElementById('hq-new-acc-name').value.trim();
+  var email  = document.getElementById('hq-new-acc-email').value.trim();
+  var pw     = document.getElementById('hq-new-acc-pw').value;
+  var branch = document.getElementById('hq-new-acc-branch').value;
+  if(!name)  { alert('이름을 입력하세요.'); return; }
+  if(!email) { alert('이메일을 입력하세요.'); return; }
+  if(!pw || pw.length < 8) { alert('비밀번호를 8자 이상 입력하세요.'); return; }
+  if(!branch){ alert('소속 지점을 선택하세요.'); return; }
+  alert('✅ ' + name + ' 관리자 계정이 생성되었습니다.\n\n소속: ' + branch + '\n이메일: ' + email);
+  closeHQModal();
+}
+
+function closeHQModal() {
+  document.querySelectorAll('[id^="hq-modal-"]').forEach(m => m.classList.remove('open'));
+}
+
+// ===== PARENT FUNCTIONS =====
+function parent_filterNotice(type, btn) {
+  document.querySelectorAll('.parent-notice-filter').forEach(b => b.classList.remove('ios-button-primary'));
+  btn.classList.add('ios-button-primary');
+  var items = document.querySelectorAll('#parent-notice-list .parent-notice-item');
+  items.forEach(function(item) {
+    if (type === 'all' || item.classList.contains('parent-notice-' + type)) {
+      item.style.display = '';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
+
+function parent_openNoticeDetail(title, tagColor, tagText) {
+  var content = parent_noticeContents[title] || '내용을 불러올 수 없습니다.';
+  var html = '<div style="padding:16px;"><div style="display:inline-block;margin-bottom:10px;"><span class="tag ' + tagColor + '">' + tagText + '</span></div>'
+    + '<div style="font-size:18px;font-weight:700;margin-bottom:8px;">' + title + '</div>'
+    + '<div style="font-size:13px;color:var(--ios-text-3);margin-bottom:16px;">06.16 · HCIS 강남센터</div>'
+    + '<div style="white-space:pre-wrap;font-size:13px;line-height:1.6;">' + content + '</div>'
+    + '<button class="ios-button ios-button-secondary ios-button-block" style="margin-top:16px;" onclick="closeParentModal()">닫기</button>'
+    + '</div>';
+  document.getElementById('parent-modal-notice-content').innerHTML = html;
+  document.getElementById('parent-modal-notice').classList.add('open');
+}
+
+function parent_openDiaryDetail(id) {
+  var d = parent_diaryData.find(function(x){ return x.id === id; });
+  if (!d) return;
+  var html = '<div style="padding:16px;"><div style="display:inline-block;margin-bottom:10px;"><span class="tag green">알림장</span></div>'
+    + '<div style="font-size:18px;font-weight:700;margin-bottom:8px;">' + d.title + '</div>'
+    + '<div style="font-size:13px;color:var(--ios-text-3);margin-bottom:16px;">👤 ' + d.teacher + ' · 📅 ' + d.date + '</div>'
+    + (d.subject ? '<div style="margin:12px 0;font-size:12px;background:var(--ios-blue);color:white;padding:6px 10px;border-radius:6px;display:inline-block;font-weight:600;">📚 ' + d.subject + '</div>' : '')
+    + '<div style="white-space:pre-wrap;font-size:13px;line-height:1.6;margin-top:16px;">' + d.body + '</div>'
+    + '<button class="ios-button ios-button-secondary ios-button-block" style="margin-top:16px;" onclick="closeParentModal()">닫기</button>'
+    + '</div>';
+  document.getElementById('parent-modal-diary-content').innerHTML = html;
+  document.getElementById('parent-modal-diary').classList.add('open');
+}
+
+function parent_goMedStep(step) {
+  [1,2,3].forEach(s => {
+    var el = document.getElementById('parent-med-step' + s);
+    if (el) el.style.display = s === step ? 'block' : 'none';
+  });
+}
+
+function parent_submitMed() {
+  alert('✅ 투약 의뢰가 제출되었습니다.');
+  closeParentModal();
+}
+
+function closeParentModal() {
+  document.querySelectorAll('[id^="parent-modal-"]').forEach(m => m.classList.remove('open'));
+}
+
+// ===== TEACHER FUNCTIONS =====
+function teacher_nav(id) {
+  document.querySelectorAll('#main-content .ios-section').forEach(s => {
+    s.classList.toggle('active', s.id === 'teacher-' + id);
+  });
+  const titles = { home: '홈', students: '학생 관리', photo: '사진 관리', notice: '공지 발송', diary: '알림장', medicine: '투약의뢰' };
+  document.getElementById('topbar-title').textContent = titles[id];
+  document.querySelectorAll('.ios-tabbar-item').forEach(t => t.classList.remove('active'));
+  document.querySelector('[data-page="teacher-' + id + '"]')?.classList.add('active');
+  closeDrawer();
+}
+
+function teacher_filterStudents(q) {
+  // Stub - for mobile, just search by name
+  var items = document.querySelectorAll('.teacher-student-item');
+  items.forEach(item => {
+    var name = item.textContent.toLowerCase();
+    item.style.display = name.includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function toggleAdminMode() {
+  currentTeacherAdminMode = !currentTeacherAdminMode;
+  const toggle = document.getElementById('admin-toggle');
+  toggle.classList.toggle('active');
+  if (currentTeacherAdminMode) {
+    showAdminPages();
+  } else {
+    hideAdminPages();
+  }
+}
+
+function showAdminPages() {
+  document.getElementById('teacher-base-pages').style.display = 'none';
+  document.getElementById('teacher-admin-pages').style.display = 'block';
+  const adminTabs = document.getElementById('tabbar-admin');
+  if (adminTabs) adminTabs.parentElement.replaceChild(adminTabs, document.getElementById('tabbar'));
+  teacher_adminNav('dashboard');
+}
+
+function hideAdminPages() {
+  document.getElementById('teacher-base-pages').style.display = 'block';
+  document.getElementById('teacher-admin-pages').style.display = 'none';
+  teacher_nav('home');
+}
+
+function teacher_adminNav(page) {
+  document.querySelectorAll('#teacher-admin-pages .ios-section').forEach(s => {
+    s.classList.toggle('active', s.id === 'admin-' + page);
+  });
+  closeDrawer();
+}
+
+// ===== ADDITIONAL HQ FUNCTIONS =====
+function hq_setSettingTab(branch, btn) {
+  document.querySelectorAll('[class*="hq-setting-filter"]').forEach(b => b.classList.remove('ios-button-primary'));
+  btn.classList.add('ios-button-primary');
+}
+
+function hq_handleToggle(cb, name) {
+  var state = cb.checked ? 'ON' : 'OFF';
+  console.log(name + ': ' + state);
+}
+
+function hq_openModal(id) {
+  document.getElementById('hq-modal-' + id)?.classList.add('open');
+}
+
+// ===== ADDITIONAL PARENT FUNCTIONS =====
+function parent_handleMedStep(step) {
+  [1,2,3].forEach(s => {
+    var el = document.getElementById('parent-med-step' + s);
+    if (el) el.style.display = s === step ? 'block' : 'none';
+  });
+}
+
+function parent_selectMedicineTime(time) {
+  document.getElementById('parent-med-selected-time').textContent = time;
+}
+
+function parent_cancelMed() {
+  if (confirm('진행 중인 투약 의뢰를 취소하시겠습니까?')) {
+    alert('투약 의뢰가 취소되었습니다.');
+  }
+}
+
+// ===== ADDITIONAL TEACHER FUNCTIONS =====
+function teacher_openStudentDetail(name, grade, group, counseled, paid, contact) {
+  var counseledTag = counseled ? '면담필요' : '완료';
+  var html = '<div style="padding:16px;"><div style="font-size:18px;font-weight:700;margin-bottom:16px;">' + name + '</div>'
+    + '<div style="background:var(--ios-fill);border-radius:10px;padding:12px;">'
+    + '<div style="display:flex;padding:6px 0;font-size:13px;"><div style="flex:1;">학년</div><div style="font-weight:600;">' + grade + '</div></div>'
+    + '<div style="display:flex;padding:6px 0;font-size:13px;"><div style="flex:1;">반</div><div style="font-weight:600;">' + group + '</div></div>'
+    + '<div style="display:flex;padding:6px 0;font-size:13px;"><div style="flex:1;">면담</div><div style="font-weight:600;">' + counseledTag + '</div></div>'
+    + '<div style="display:flex;padding:6px 0;font-size:13px;"><div style="flex:1;">납부</div><div style="font-weight:600;">' + paid + '</div></div>'
+    + '</div></div>';
+  document.getElementById('teacher-student-detail-content').innerHTML = html;
+  document.getElementById('teacher-student-detail').classList.add('open');
+}
+
+function teacher_closeModal() {
+  document.querySelectorAll('[id^="teacher-modal-"]').forEach(m => m.classList.remove('open'));
+}
+
+function teacher_submitNotice() {
+  alert('✅ 공지가 발송되었습니다.');
+}
+
+function teacher_submitDiary() {
+  alert('✅ 알림장이 발송되었습니다.');
+}
+
+function teacher_confirmMedicine(name) {
+  alert('✅ ' + name + '의 투약을 확인했습니다.');
+}
+
+// ===== ADMIN FUNCTIONS (FRANCHISE) =====
+function admin_submitPayment(studentName) {
+  var amount = document.getElementById('admin-pay-amount')?.value || '0';
+  alert('✅ ' + studentName + '의 ' + amount + '원 결제가 완료되었습니다.');
+}
+
+function admin_openPaymentForm(studentName, unpaidAmount) {
+  document.getElementById('admin-pay-student').textContent = studentName;
+  document.getElementById('admin-pay-amount').value = unpaidAmount;
+  document.getElementById('admin-payment-modal').classList.add('open');
+}
+
+function admin_closePaymentModal() {
+  document.getElementById('admin-payment-modal').classList.remove('open');
+}
+
+function admin_sendSMS(studentName) {
+  alert('✅ ' + studentName + '에게 SMS를 발송했습니다.');
+}
+
+function admin_openConsultationDetail(studentName) {
+  alert('📋 ' + studentName + '의 상담 기록을 조회합니다.');
+}
+
+function admin_renderAnalytics() {
+  // Placeholder for analytics rendering
+  console.log('Analytics data loaded');
+}
+
+function admin_switchTab(tabName) {
+  document.querySelectorAll('[class*="admin-tab-content"]').forEach(el => {
+    el.style.display = el.id === ('admin-tab-' + tabName) ? 'block' : 'none';
+  });
+}
+
+// ===== FRANCHISE/ADMIN FUNCTIONS =====
+function admin_setPayFilter(f) {
+  franchise_payFilter = f;
+  document.querySelectorAll('.admin-pay-filter').forEach(btn => btn.classList.remove('ios-button-primary'));
+  document.querySelector('[data-filter="' + f + '"]')?.classList.add('ios-button-primary');
+}
+
+function admin_filterStudents(q) {
+  var items = document.querySelectorAll('.admin-student-item');
+  items.forEach(item => {
+    var name = item.getAttribute('data-name') || '';
+    var match = !q || name.includes(q);
+    item.style.display = match ? '' : 'none';
+  });
+}
+
+// ===== DRAWER UTILS =====
+function toggleDrawer() {
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('drawer-overlay');
+  if (drawer.classList.contains('open')) {
+    closeDrawer();
+  } else {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+  }
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+}
+
+// ===== HQ APP =====
+function initHQApp() {
+  const avatar = document.querySelector('.ios-avatar-btn');
+  avatar.textContent = 'HQ';
+
+  // Drawer menu
+  const drawer = document.getElementById('drawer-content');
+  drawer.innerHTML = `
+    <div class="ios-drawer-section">
+      <button class="ios-drawer-item active" onclick="hq_nav('home')">
+        <span class="ios-drawer-icon mi">home</span>
+        <span class="ios-drawer-label">홈</span>
+      </button>
+      <button class="ios-drawer-item" onclick="hq_nav('branch')">
+        <span class="ios-drawer-icon mi">store</span>
+        <span class="ios-drawer-label">지점 관리</span>
+      </button>
+      <button class="ios-drawer-item" onclick="hq_nav('account')">
+        <span class="ios-drawer-icon mi">manage_accounts</span>
+        <span class="ios-drawer-label">계정 관리</span>
+      </button>
+      <button class="ios-drawer-item" onclick="hq_nav('settings')">
+        <span class="ios-drawer-icon mi">settings</span>
+        <span class="ios-drawer-label">기본 설정</span>
+      </button>
+    </div>
+  `;
+
+  // Bottom tabs
+  const tabs = document.getElementById('tabbar');
+  tabs.innerHTML = `
+    <button class="ios-tabbar-item active" onclick="hq_nav('home')" data-page="hq-home">
+      <span class="ios-tabbar-icon mi">home</span>
+      <div class="ios-tabbar-label">홈</div>
+    </button>
+    <button class="ios-tabbar-item" onclick="hq_nav('branch')" data-page="hq-branch">
+      <span class="ios-tabbar-icon mi">store</span>
+      <div class="ios-tabbar-label">지점</div>
+    </button>
+    <button class="ios-tabbar-item" onclick="hq_nav('account')" data-page="hq-account">
+      <span class="ios-tabbar-icon mi">manage_accounts</span>
+      <div class="ios-tabbar-label">계정</div>
+    </button>
+    <button class="ios-tabbar-item" onclick="hq_nav('settings')" data-page="hq-settings">
+      <span class="ios-tabbar-icon mi">settings</span>
+      <div class="ios-tabbar-label">설정</div>
+    </button>
+  `;
+
+  // Main content
+  const main = document.getElementById('main-content');
+  main.innerHTML = `
+    <section class="ios-section active" id="hq-home">
+      <div class="ios-page-header">
+        <h1 class="ios-large-title">안녕하세요</h1>
+        <div class="ios-page-subtitle">본사 관리자님</div>
+      </div>
+      <div style="padding:0 16px 16px;">
+        <div class="ios-card" style="padding:0;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;">
+            <div style="padding:16px;text-align:center;border-right:0.5px solid var(--ios-separator);">
+              <div style="font-size:24px;font-weight:700;color:var(--ios-blue);margin-bottom:4px;">3</div>
+              <div style="font-size:12px;color:var(--ios-text-3);">운영 지점</div>
+            </div>
+            <div style="padding:16px;text-align:center;border-right:0.5px solid var(--ios-separator);">
+              <div style="font-size:24px;font-weight:700;color:var(--ios-blue);margin-bottom:4px;">8</div>
+              <div style="font-size:12px;color:var(--ios-text-3);">관리자 계정</div>
+            </div>
+            <div style="padding:16px;text-align:center;">
+              <div style="font-size:24px;font-weight:700;color:var(--ios-green);margin-bottom:4px;">42</div>
+              <div style="font-size:12px;color:var(--ios-text-3);">총 학생 수</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:0 16px;">
+        <div class="ios-list">
+          <div class="ios-row ios-row-tappable" onclick="hq_nav('branch')">
+            <span class="ios-row-icon mi">store</span>
+            <div class="ios-row-content">
+              <div class="ios-row-label">강남 센터</div>
+              <div class="ios-row-detail">관리자 3명 · 학생 18명</div>
+            </div>
+            <span class="ios-row-chevron mi">chevron_right</span>
+          </div>
+          <div class="ios-row ios-row-tappable" onclick="hq_nav('branch')">
+            <span class="ios-row-icon mi">store</span>
+            <div class="ios-row-content">
+              <div class="ios-row-label">서초 센터</div>
+              <div class="ios-row-detail">관리자 2명 · 학생 14명</div>
+            </div>
+            <span class="ios-row-chevron mi">chevron_right</span>
+          </div>
+          <div class="ios-row ios-row-tappable" onclick="hq_nav('branch')">
+            <span class="ios-row-icon mi">store</span>
+            <div class="ios-row-content">
+              <div class="ios-row-label">송파 센터</div>
+              <div class="ios-row-detail">관리자 3명 · 학생 10명</div>
+            </div>
+            <span class="ios-row-chevron mi">chevron_right</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ios-section" id="hq-branch">
+      <div class="ios-page-header">
+        <h1 class="ios-large-title">지점 관리</h1>
+        <div class="ios-page-subtitle">지점을 생성하고 관리하세요</div>
+      </div>
+      <div style="padding:0 16px;">
+        <button class="ios-button ios-button-primary ios-button-block" onclick="document.getElementById('hq-modal-add-branch').classList.add('open')" style="margin-bottom:16px;">
+          <span class="mi" style="font-size:18px;">add</span> 새 지점 추가
+        </button>
+        <div class="ios-list">
+          <div class="ios-row ios-row-tappable" onclick="hq_openBranchDetail('강남 센터')">
+            <span class="ios-row-icon mi">store</span>
+            <div class="ios-row-content">
+              <div class="ios-row-label">강남 센터</div>
+              <div class="ios-row-detail">02-1234-5678</div>
+            </div>
+            <span class="ios-row-chevron mi">chevron_right</span>
+          </div>
+          <div class="ios-row ios-row-tappable" onclick="hq_openBranchDetail('서초 센터')">
+            <span class="ios-row-icon mi">store</span>
+            <div class="ios-row-content">
+              <div class="ios-row-label">서초 센터</div>
+              <div class="ios-row-detail">02-2345-6789</div>
+            </div>
+            <span class="ios-row-chevron mi">chevron_right</span>
+          </div>
+          <div class="ios-row ios-row-tappable" onclick="hq_openBranchDetail('송파 센터')">
+            <span class="ios-row-icon mi">store</span>
+            <div class="ios-row-content">
+              <div class="ios-row-label">송파 센터</div>
+              <div class="ios-row-detail">02-3456-7890</div>
+            </div>
+            <span class="ios-row-chevron mi">chevron_right</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ios-section" id="hq-account">
+      <div class="ios-page-header">
+        <h1 class="ios-large-title">계정 관리</h1>
+        <div class="ios-page-subtitle">관리자 계정을 생성하세요</div>
+      </div>
+      <div style="padding:0 16px;">
+        <button class="ios-button ios-button-primary ios-button-block" onclick="document.getElementById('hq-modal-add-account').classList.add('open')" style="margin-bottom:16px;">
+          <span class="mi" style="font-size:18px;">person_add</span> 새 계정 생성
+        </button>
+        <div class="ios-list">
+          <div class="ios-row">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--ios-blue);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">박</div>
+            <div class="ios-row-content">
+              <div class="ios-row-label">박지수</div>
+              <div class="ios-row-detail">강남 센터 · jisoo@hcis.kr</div>
+            </div>
+          </div>
+          <div class="ios-row">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--ios-purple);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">이</div>
+            <div class="ios-row-content">
+              <div class="ios-row-label">이수민</div>
+              <div class="ios-row-detail">강남 센터 · sumin@hcis.kr</div>
+            </div>
+          </div>
+          <div class="ios-row">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--ios-orange);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">최</div>
+            <div class="ios-row-content">
+              <div class="ios-row-label">최지혜</div>
+              <div class="ios-row-detail">강남 센터 · jihye@hcis.kr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ios-section" id="hq-settings">
+      <div class="ios-page-header">
+        <h1 class="ios-large-title">기본 설정</h1>
+        <div class="ios-page-subtitle">지점별 기능을 관리하세요</div>
+      </div>
+      <div style="padding:0 16px;">
+        <div class="ios-list">
+          <div class="ios-row" style="justify-content:space-between;">
+            <div>
+              <div class="ios-row-label" style="margin:0;">서비스 운영</div>
+              <div class="ios-row-detail">지점 전체 서비스 ON/OFF</div>
+            </div>
+            <input type="checkbox" checked style="accent-color:var(--ios-blue);width:44px;height:28px;">
+          </div>
+          <div class="ios-row" style="justify-content:space-between;">
+            <div>
+              <div class="ios-row-label" style="margin:0;">알림장</div>
+              <div class="ios-row-detail">선생님 → 학부모 알림장</div>
+            </div>
+            <input type="checkbox" checked style="accent-color:var(--ios-blue);width:44px;height:28px;">
+          </div>
+          <div class="ios-row" style="justify-content:space-between;">
+            <div>
+              <div class="ios-row-label" style="margin:0;">투약의뢰</div>
+              <div class="ios-row-detail">학부모 → 선생님 투약 의뢰</div>
+            </div>
+            <input type="checkbox" checked style="accent-color:var(--ios-blue);width:44px;height:28px;">
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+
+  // Modals
+  const modalLayer = document.getElementById('modal-layer');
+  modalLayer.innerHTML += `
+    <div class="ios-modal-overlay" id="hq-modal-add-branch" onclick="if(event.target===this)closeHQModal()">
+      <div class="ios-modal">
+        <div class="ios-modal-handle"></div>
+        <div class="ios-modal-header">
+          <div class="ios-modal-title">새 지점 추가</div>
+          <button class="ios-modal-close" onclick="closeHQModal()"><span class="mi">close</span></button>
+        </div>
+        <div style="padding:16px;">
+          <div class="ios-form-group">
+            <label class="ios-form-label">지점명</label>
+            <input type="text" id="hq-new-branch-name" class="ios-form-input" placeholder="예: 강남 센터">
+          </div>
+          <div class="ios-form-group">
+            <label class="ios-form-label">연락처</label>
+            <input type="text" id="hq-new-branch-tel" class="ios-form-input" placeholder="예: 02-1234-5678">
+          </div>
+          <button class="ios-button ios-button-primary ios-button-block" onclick="hq_submitBranch()">지점 추가</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ios-modal-overlay" id="hq-modal-add-account" onclick="if(event.target===this)closeHQModal()">
+      <div class="ios-modal">
+        <div class="ios-modal-handle"></div>
+        <div class="ios-modal-header">
+          <div class="ios-modal-title">관리자 계정 생성</div>
+          <button class="ios-modal-close" onclick="closeHQModal()"><span class="mi">close</span></button>
+        </div>
+        <div style="padding:16px;">
+          <div class="ios-form-group">
+            <label class="ios-form-label">이름</label>
+            <input type="text" id="hq-new-acc-name" class="ios-form-input" placeholder="이름">
+          </div>
+          <div class="ios-form-group">
+            <label class="ios-form-label">이메일</label>
+            <input type="email" id="hq-new-acc-email" class="ios-form-input" placeholder="이메일">
+          </div>
+          <div class="ios-form-group">
+            <label class="ios-form-label">비밀번호</label>
+            <input type="password" id="hq-new-acc-pw" class="ios-form-input" placeholder="8자 이상">
+          </div>
+          <div class="ios-form-group">
+            <label class="ios-form-label">소속 지점</label>
+            <select id="hq-new-acc-branch" class="ios-form-select">
+              <option value="">지점 선택</option>
+              <option value="강남 센터">강남 센터</option>
+              <option value="서초 센터">서초 센터</option>
+              <option value="송파 센터">송파 센터</option>
+            </select>
+          </div>
+          <button class="ios-button ios-button-primary ios-button-block" onclick="hq_submitAccount()">계정 생성</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ios-modal-overlay" id="hq-modal-branch-detail" onclick="if(event.target===this)closeHQModal()">
+      <div class="ios-modal">
+        <div class="ios-modal-handle"></div>
+        <div id="hq-modal-branch-detail-content"></div>
+      </div>
+    </div>
+  `;
+
+  hq_nav('home');
+}
+
+// ===== PARENT APP =====
+function initParentApp() {
+  const avatar = document.querySelector('.ios-avatar-btn');
+  avatar.textContent = '학부모';
+
+  // Drawer menu
+  const drawer = document.getElementById('drawer-content');
+  drawer.innerHTML = `
+    <div class="ios-drawer-section">
+      <button class="ios-drawer-item active" onclick="parent_nav('home')">
+        <span class="ios-drawer-icon mi">home</span>
+        <span class="ios-drawer-label">홈</span>
+      </button>
+      <button class="ios-drawer-item" onclick="parent_nav('child')">
+        <span class="ios-drawer-icon mi">child_care</span>
+        <span class="ios-drawer-label">자녀</span>
+      </button>
+      <button class="ios-drawer-item" onclick="parent_nav('notice')">
+        <span class="ios-drawer-icon mi">notifications</span>
+        <span class="ios-drawer-label">공지</span>
+      </button>
+      <button class="ios-drawer-item" onclick="parent_nav('diary')">
+        <span class="ios-drawer-icon mi">edit_note</span>
+        <span class="ios-drawer-label">알림장</span>
+      </button>
+      <button class="ios-drawer-item" onclick="parent_nav('medicine')">
+        <span class="ios-drawer-icon mi">medication</span>
+        <span class="ios-drawer-label">투약의뢰</span>
+      </button>
+    </div>
+  `;
+
+  // Bottom tabs
+  const tabs = document.getElementById('tabbar');
+  tabs.innerHTML = `
+    <button class="ios-tabbar-item active" onclick="parent_nav('home')" data-page="parent-home">
+      <span class="ios-tabbar-icon mi">home</span>
+      <div class="ios-tabbar-label">홈</div>
+    </button>
+    <button class="ios-tabbar-item" onclick="parent_nav('child')" data-page="parent-child">
+      <span class="ios-tabbar-icon mi">child_care</span>
+      <div class="ios-tabbar-label">자녀</div>
+    </button>
+    <button class="ios-tabbar-item" onclick="parent_nav('notice')" data-page="parent-notice">
+      <span class="ios-tabbar-icon mi">notifications</span>
+      <div class="ios-tabbar-label">공지</div>
+    </button>
+    <button class="ios-tabbar-item" onclick="parent_nav('diary')" data-page="parent-diary">
+      <span class="ios-tabbar-icon mi">edit_note</span>
+      <div class="ios-tabbar-label">알림장</div>
+    </button>
+    <button class="ios-tabbar-item" onclick="parent_nav('medicine')" data-page="parent-medicine">
+      <span class="ios-tabbar-icon mi">medication</span>
+      <div class="ios-tabbar-label">투약</div>
+    </button>
+  `;
+
+  // Main content
+  const main = document.getElementById('main-content');
+  main.innerHTML = `
+    <section class="ios-section active" id="parent-home">
+      <div class="ios-page-header">
+        <h1 class="ios-large-title">환영합니다</h1>
+        <div class="ios-page-subtitle">학부모님</div>
+      </div>
+      <div style="padding:0 16px;">
+        <div class="ios-card" style="padding:16px;">
+          <div style="font-size:14px;color:var(--ios-text);">아이의 성장을 함께 응원합니다.<br>오늘 학습 알림장을 확인해 보셨나요?</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ios-section" id="parent-child">
+      <div class="ios-page-header">
+        <h1 class="ios-large-title">자녀 정보</h1>
+      </div>
+      <div style="padding:0 16px;">
+        <div class="ios-card" style="padding:16px;text-align:center;">
+          <div style="width:80px;height:80px;border-radius:50%;background:var(--ios-blue);color:white;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;margin:0 auto 16px;">민</div>
+          <div class="ios-row-label" style="margin:0;">김민준</div>
+          <div class="ios-row-detail">Forest반 · 만 7세</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ios-section" id="parent-notice">
+      <div class="ios-page-header">
+        <h1 class="ios-large-title">공지사항</h1>
+      </div>
+      <div style="padding:0 16px;">
+        <div style="margin-bottom:12px;">
+          <button class="ios-button ios-button-secondary parent-notice-filter" onclick="parent_filterNotice('all', this)">전체</button>
+          <button class="ios-button ios-button-secondary parent-notice-filter" onclick="parent_filterNotice('center', this)">센터공지</button>
+          <button class="ios-button ios-button-secondary parent-notice-filter" onclick="parent_filterNotice('teacher', this)">담임공지</button>
+        </div>
+        <div id="parent-notice-list">
+          <div class="parent-notice-item parent-notice-center ios-row ios-row-tappable" onclick="parent_openNoticeDetail('6월 학부모 참관 수업 안내', 'blue', '센터')">
+            <div class="ios-row-content">
+              <div class="ios-row-label">6월 학부모 참관 수업 안내</div>
+              <div class="ios-row-detail">06.16 · HCIS 강남센터</div>
+            </div>
+            <span class="ios-row-chevron mi">chevron_right</span>
+          </div>
+          <div class="parent-notice-item parent-notice-center ios-row ios-row-tappable" style="margin-top:8px;border-radius:12px;background:var(--ios-card);" onclick="parent_openNoticeDetail('7월 방학 일정 안내', 'blue', '센터')">
+            <div class="ios-row-content">
+              <div class="ios-row-label">7월 방학 일정 안내</div>
+              <div class="ios-row-detail">06.15 · HCIS 강남센터</div>
+            </div>
+            <span class="ios-row-chevron mi">chevron_right</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ios-section" id="parent-diary">
+      <div class="ios-page-header">
+        <h1 class="ios-large-title">알림장</h1>
+      </div>
+      <div style="padding:0 16px;">
+        <div class="ios-list">
+          <div class="ios-row ios-row-tappable" onclick="parent_openDiaryDetail(1)">
+            <div class="ios-row-content">
+              <div class="ios-row-label">오늘의 학습: 영어 파닉스 3단원</div>
+              <div class="ios-row-detail">2024.06.17 · 박지수 선생님</div>
+            </div>
+            <span class="ios-row-chevron mi">chevron_right</span>
+          </div>
+          <div class="ios-row ios-row-tappable" onclick="parent_openDiaryDetail(2)">
+            <div class="ios-row-content">
+              <div class="ios-row-label">수학 Level B - 이번주 진도 공유</div>
+              <div class="ios-row-detail">2024.06.16 · 박지수 선생님</div>
+            </div>
+            <span class="ios-row-chevron mi">chevron_right</span>
+          </div>
+          <div class="ios-row ios-row-tappable" onclick="parent_openDiaryDetail(3)">
+            <div class="ios-row-content">
+              <div class="ios-row-label">이번주 필독도서 안내</div>
+              <div class="ios-row-detail">2024.06.14 · 박지수 선생님</div>
+            </div>
+            <span class="ios-row-chevron mi">chevron_right</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ios-section" id="parent-medicine">
+      <div class="ios-page-header">
+        <h1 class="ios-large-title">투약의뢰</h1>
+      </div>
+      <div style="padding:0 16px;">
+        <button class="ios-button ios-button-primary ios-button-block" style="margin-bottom:16px;">
+          <span class="mi">add</span> 투약의뢰 추가
+        </button>
+        <div id="parent-med-step1" class="ios-card" style="padding:16px;">
+          <div style="font-size:13px;color:var(--ios-text-2);margin-bottom:12px;font-weight:600;">투약의뢰 신청</div>
+          <div class="ios-form-group">
+            <label class="ios-form-label">약 이름</label>
+            <input type="text" id="parent-med-name" class="ios-form-input" placeholder="약 이름">
+          </div>
+          <button class="ios-button ios-button-primary ios-button-block" onclick="parent_goMedStep(2)">계속</button>
+        </div>
+        <div id="parent-med-step2" style="display:none;"></div>
+        <div id="parent-med-step3" style="display:none;"></div>
+      </div>
+    </section>
+  `;
+
+  // Modals
+  const modalLayer = document.getElementById('modal-layer');
+  modalLayer.innerHTML += `
+    <div class="ios-modal-overlay" id="parent-modal-notice" onclick="if(event.target===this)closeParentModal()">
+      <div class="ios-modal">
+        <div class="ios-modal-handle"></div>
+        <div id="parent-modal-notice-content"></div>
+      </div>
+    </div>
+
+    <div class="ios-modal-overlay" id="parent-modal-diary" onclick="if(event.target===this)closeParentModal()">
+      <div class="ios-modal">
+        <div class="ios-modal-handle"></div>
+        <div id="parent-modal-diary-content"></div>
+      </div>
+    </div>
+  `;
+
+  parent_nav('home');
+}
+
+function parent_nav(id) {
+  document.querySelectorAll('#main-content .ios-section').forEach(s => {
+    s.classList.toggle('active', s.id === 'parent-' + id);
+  });
+  const titles = { home: '홈', child: '자녀 정보', notice: '공지사항', diary: '알림장', medicine: '투약의뢰' };
+  document.getElementById('topbar-title').textContent = titles[id];
+  document.querySelectorAll('.ios-tabbar-item').forEach(t => t.classList.remove('active'));
+  document.querySelector('[data-page="parent-' + id + '"]')?.classList.add('active');
+  closeDrawer();
+}
+
+// ===== TEACHER APP =====
+function initTeacherApp() {
+  const avatar = document.querySelector('.ios-avatar-btn');
+  avatar.textContent = '선생님';
+
+  // Drawer menu
+  const drawer = document.getElementById('drawer-content');
+  drawer.innerHTML = `
+    <div class="ios-drawer-section">
+      <button class="ios-drawer-item active" onclick="teacher_nav('home')">
+        <span class="ios-drawer-icon mi">home</span>
+        <span class="ios-drawer-label">홈</span>
+      </button>
+      <button class="ios-drawer-item" onclick="teacher_nav('students')">
+        <span class="ios-drawer-icon mi">groups</span>
+        <span class="ios-drawer-label">학생</span>
+      </button>
+      <button class="ios-drawer-item" onclick="teacher_nav('notice')">
+        <span class="ios-drawer-icon mi">campaign</span>
+        <span class="ios-drawer-label">공지</span>
+      </button>
+      <button class="ios-drawer-item" onclick="teacher_nav('diary')">
+        <span class="ios-drawer-icon mi">edit_note</span>
+        <span class="ios-drawer-label">알림장</span>
+      </button>
+      <button class="ios-drawer-item" onclick="teacher_nav('medicine')">
+        <span class="ios-drawer-icon mi">medication</span>
+        <span class="ios-drawer-label">투약</span>
+      </button>
+    </div>
+    <div class="ios-drawer-section">
+      <div class="ios-drawer-item" style="padding:16px;cursor:default;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:12px;flex:1;">
+          <span class="ios-drawer-icon mi">admin_panel_settings</span>
+          <span class="ios-drawer-label">관리자 모드</span>
+        </div>
+        <button class="ios-role-toggle" id="admin-toggle" onclick="toggleAdminMode()" style="flex-shrink:0;"></button>
+      </div>
+    </div>
+  `;
+
+  // Bottom tabs (Teacher)
+  const tabs = document.getElementById('tabbar');
+  tabs.innerHTML = `
+    <button class="ios-tabbar-item active" onclick="teacher_nav('home')" data-page="teacher-home">
+      <span class="ios-tabbar-icon mi">home</span>
+      <div class="ios-tabbar-label">홈</div>
+    </button>
+    <button class="ios-tabbar-item" onclick="teacher_nav('students')" data-page="teacher-students">
+      <span class="ios-tabbar-icon mi">groups</span>
+      <div class="ios-tabbar-label">학생</div>
+    </button>
+    <button class="ios-tabbar-item" onclick="teacher_nav('notice')" data-page="teacher-notice">
+      <span class="ios-tabbar-icon mi">campaign</span>
+      <div class="ios-tabbar-label">공지</div>
+    </button>
+    <button class="ios-tabbar-item" onclick="teacher_nav('diary')" data-page="teacher-diary">
+      <span class="ios-tabbar-icon mi">edit_note</span>
+      <div class="ios-tabbar-label">알림장</div>
+    </button>
+    <button class="ios-tabbar-item" onclick="teacher_nav('medicine')" data-page="teacher-medicine">
+      <span class="ios-tabbar-icon mi">medication</span>
+      <div class="ios-tabbar-label">투약</div>
+    </button>
+  `;
+
+  // Main content
+  const main = document.getElementById('main-content');
+  main.innerHTML = `
+    <div id="teacher-base-pages">
+      <section class="ios-section active" id="teacher-home">
+        <div class="ios-page-header">
+          <h1 class="ios-large-title">안녕하세요</h1>
+          <div class="ios-page-subtitle">박지수 선생님</div>
+        </div>
+        <div style="padding:0 16px;">
+          <div class="ios-card" style="padding:16px;">
+            <div style="font-size:32px;font-weight:700;color:var(--ios-blue);margin-bottom:4px;">12</div>
+            <div style="font-size:13px;color:var(--ios-text-3);">담당 학생 수</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="ios-section" id="teacher-students">
+        <div class="ios-page-header">
+          <h1 class="ios-large-title">학생 관리</h1>
+        </div>
+        <div style="padding:0 16px;">
+          <input type="text" class="ios-form-input" placeholder="학생 검색..." style="margin-bottom:12px;" onkeyup="teacher_filterStudents(this.value)">
+          <div class="ios-list">
+            <div class="ios-row ios-row-tappable teacher-student-item" data-name="김민준">
+              <div style="width:40px;height:40px;border-radius:50%;background:var(--ios-blue);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;">김</div>
+              <div class="ios-row-content">
+                <div class="ios-row-label">김민준</div>
+                <div class="ios-row-detail">Forest반 · 만 7세</div>
+              </div>
+              <span class="ios-row-chevron mi">chevron_right</span>
+            </div>
+            <div class="ios-row ios-row-tappable teacher-student-item" data-name="이은준">
+              <div style="width:40px;height:40px;border-radius:50%;background:var(--ios-green);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;">이</div>
+              <div class="ios-row-content">
+                <div class="ios-row-label">이은준</div>
+                <div class="ios-row-detail">Forest반 · 만 6세</div>
+              </div>
+              <span class="ios-row-chevron mi">chevron_right</span>
+            </div>
+            <div class="ios-row ios-row-tappable teacher-student-item" data-name="박하은">
+              <div style="width:40px;height:40px;border-radius:50%;background:var(--ios-orange);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;">박</div>
+              <div class="ios-row-content">
+                <div class="ios-row-label">박하은</div>
+                <div class="ios-row-detail">Forest반 · 만 6세</div>
+              </div>
+              <span class="ios-row-chevron mi">chevron_right</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="ios-section" id="teacher-notice">
+        <div class="ios-page-header">
+          <h1 class="ios-large-title">공지 발송</h1>
+        </div>
+        <div style="padding:0 16px;">
+          <button class="ios-button ios-button-primary ios-button-block" style="margin-bottom:16px;">
+            <span class="mi">add</span> 공지 작성
+          </button>
+          <div class="ios-card" style="padding:16px;color:var(--ios-text-3);text-align:center;">
+            발송된 공지가 없습니다.
+          </div>
+        </div>
+      </section>
+
+      <section class="ios-section" id="teacher-diary">
+        <div class="ios-page-header">
+          <h1 class="ios-large-title">알림장</h1>
+        </div>
+        <div style="padding:0 16px;">
+          <button class="ios-button ios-button-primary ios-button-block" style="margin-bottom:16px;">
+            <span class="mi">add</span> 알림장 작성
+          </button>
+          <div class="ios-card" style="padding:16px;color:var(--ios-text-3);text-align:center;">
+            작성된 알림장이 없습니다.
+          </div>
+        </div>
+      </section>
+
+      <section class="ios-section" id="teacher-medicine">
+        <div class="ios-page-header">
+          <h1 class="ios-large-title">투약의뢰</h1>
+        </div>
+        <div style="padding:0 16px;">
+          <div class="ios-card" style="padding:12px 16px;background:var(--ios-red);color:white;border-radius:12px;margin-bottom:16px;">
+            <div style="font-weight:600;">미확인 투약의뢰</div>
+            <div style="font-size:28px;font-weight:700;margin-top:4px;">2</div>
+          </div>
+          <div class="ios-card-title">대기 중인 의뢰</div>
+          <div class="ios-list">
+            <div class="ios-row">
+              <div style="width:40px;height:40px;border-radius:50%;background:var(--ios-blue);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;">유</div>
+              <div class="ios-row-content">
+                <div class="ios-row-label">유다인</div>
+                <div class="ios-row-detail">09:28 · 타이레놀 시럽</div>
+              </div>
+            </div>
+            <div class="ios-row">
+              <div style="width:40px;height:40px;border-radius:50%;background:var(--ios-green);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;">장</div>
+              <div class="ios-row-content">
+                <div class="ios-row-label">장하늘</div>
+                <div class="ios-row-detail">10:15 · 아목시실린</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="teacher-admin-pages" style="display:none;">
+      <section class="ios-section active" id="admin-dashboard">
+        <div class="ios-page-header">
+          <h1 class="ios-large-title">관리자 대시보드</h1>
+        </div>
+        <div style="padding:0 16px;">
+          <div class="ios-card" style="padding:0;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+              <div style="padding:16px;text-align:center;border-right:0.5px solid var(--ios-separator);">
+                <div style="font-size:24px;font-weight:700;color:var(--ios-blue);margin-bottom:4px;">12</div>
+                <div style="font-size:12px;color:var(--ios-text-3);">등록 학생</div>
+              </div>
+              <div style="padding:16px;text-align:center;">
+                <div style="font-size:24px;font-weight:700;color:var(--ios-red);margin-bottom:4px;">3</div>
+                <div style="font-size:12px;color:var(--ios-text-3);">미납</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="ios-section" id="admin-students">
+        <div class="ios-page-header">
+          <h1 class="ios-large-title">학생 관리</h1>
+        </div>
+        <div style="padding:0 16px;">
+          <div style="margin-bottom:12px;">
+            <button class="ios-button ios-button-primary admin-pay-filter" data-filter="all" onclick="admin_setPayFilter('all')">전체</button>
+            <button class="ios-button ios-button-secondary admin-pay-filter" data-filter="unpaid" onclick="admin_setPayFilter('unpaid')">미납</button>
+          </div>
+          <div style="margin-bottom:12px;">
+            <input type="text" class="ios-form-input" placeholder="학생 검색..." onkeyup="admin_filterStudents(this.value)">
+          </div>
+          <div class="ios-list">
+` + franchise_students.map(s => `
+            <div class="admin-student-item ios-row ios-row-tappable" data-name="${s.name}">
+              <div class="ios-row-content">
+                <div class="ios-row-label">${s.name}</div>
+                <div class="ios-row-detail">${s.grade} · ${s.paid}</div>
+              </div>
+              <span class="ios-row-chevron mi">chevron_right</span>
+            </div>
+`).join('') + `
+          </div>
+        </div>
+      </section>
+
+      <section class="ios-section" id="admin-analytics">
+        <div class="ios-page-header">
+          <h1 class="ios-large-title">통계</h1>
+        </div>
+        <div style="padding:0 16px;">
+          <div class="ios-card" style="padding:16px;">
+            <div style="font-size:14px;color:var(--ios-text-3);text-align:center;">분석 데이터 표시 예정</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  `;
+
+  teacher_nav('home');
+}
+</script>
+
+</body>
+</html>
