@@ -31,10 +31,7 @@ export function LandingHeader() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
           <LogoMark />
-          <div className="leading-tight">
-            <div className="text-[15px] font-bold tracking-tight">레티튜초등학교</div>
-            <div className="text-[10px] text-ink-tertiary">프리미엄 교육 파트너</div>
-          </div>
+          <span className="text-[15px] font-bold tracking-tight">레티튜초등학교</span>
         </Link>
 
         {/* Desktop nav */}
@@ -141,24 +138,10 @@ function useLoginSafe() {
 
 export function LogoMark() {
   return (
-    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-[#7BB1FF] shadow-elev3">
-      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-        <path
-          d="M2 14c2-3 4-3 6 0s4 3 6 0 4-3 6 0"
-          stroke="#fff"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M2 18c2-3 4-3 6 0s4 3 6 0 4-3 6 0"
-          stroke="#fff"
-          strokeOpacity="0.65"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </span>
+    <img
+      src="/images/logo-only-symbol.png"
+      alt="레티튜초등학교 로고"
+      className="h-9 w-9 object-contain"
+    />
   );
 }

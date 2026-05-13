@@ -33,21 +33,23 @@ export function HomeTeaser() {
               return (
                 <li
                   key={n.id}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-muted md:px-5",
-                    i !== notices.length - 1 && "border-b border-divider"
-                  )}
+                  className={cn(i !== notices.length - 1 && "border-b border-divider")}
                 >
-                  <span
-                    className={cn(
-                      "rounded-md px-2 py-0.5 text-[10.5px] font-semibold",
-                      isPinned ? "bg-brand-50 text-brand-600" : "bg-muted text-ink-secondary"
-                    )}
+                  <Link
+                    href={`/notices/${n.id}`}
+                    className="flex items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-muted md:px-5"
                   >
-                    {n.tag || (isPinned ? "필독" : "안내")}
-                  </span>
-                  <span className="flex-1 truncate text-ink-primary">{n.title}</span>
-                  <span className="hidden text-xs text-ink-tertiary md:inline">{n.date}</span>
+                    <span
+                      className={cn(
+                        "rounded-md px-2 py-0.5 text-[10.5px] font-semibold",
+                        isPinned ? "bg-brand-50 text-brand-600" : "bg-muted text-ink-secondary"
+                      )}
+                    >
+                      {n.tag || (isPinned ? "필독" : "안내")}
+                    </span>
+                    <span className="flex-1 truncate text-ink-primary">{n.title}</span>
+                    <span className="hidden text-xs text-ink-tertiary md:inline">{n.date}</span>
+                  </Link>
                 </li>
               );
             })}
@@ -66,9 +68,10 @@ export function HomeTeaser() {
               {photos.map((p, i) => {
                 const src = p.imageUrl || FALLBACK_IMAGES[i % FALLBACK_IMAGES.length];
                 return (
-                  <div
+                  <Link
                     key={p.id}
-                    className="group relative aspect-square overflow-hidden rounded-2xl shadow-elev1 transition-transform hover:-translate-y-0.5"
+                    href={`/gallery/${p.id}`}
+                    className="group relative block aspect-square overflow-hidden rounded-2xl shadow-elev1 transition-transform hover:-translate-y-0.5"
                   >
                     <img
                       src={src}
@@ -80,7 +83,7 @@ export function HomeTeaser() {
                       <div className="text-[11px] font-semibold leading-tight">{p.title}</div>
                       <div className="text-[10px] opacity-80">{p.date}</div>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -101,7 +104,7 @@ function SectionHead({
   href: string;
 }) {
   return (
-    <div className="mb-4 flex items-end justify-between">
+    <div className="mb-4 flex items-end justify-between gap-2">
       <div>
         <h3 className="text-xl font-bold tracking-tight md:text-2xl">{title}</h3>
         <p className="mt-1 text-xs text-ink-secondary">{subtitle}</p>

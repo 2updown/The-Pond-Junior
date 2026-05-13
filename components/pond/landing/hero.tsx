@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useLogin } from "./landing-shell";
+import { useContact } from "./landing-shell";
 
 export function Hero() {
-  const login = useLogin();
+  const contact = useContact();
   return (
     <section className="relative w-full overflow-hidden" id="about">
       {/* Background image — full width */}
@@ -42,7 +42,7 @@ export function Hero() {
             학원소개 보기
           </Link>
           <button
-            onClick={login.open}
+            onClick={contact.open}
             className="rounded-md border border-white/70 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
           >
             상담문의

@@ -1,10 +1,10 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
-import { useLogin } from "./landing-shell";
+import { useContact } from "./landing-shell";
 
 export function CtaBanner() {
-  const login = useLogin();
+  const contact = useContact();
   return (
     <section className="mx-auto max-w-6xl px-5 py-10 md:py-14">
       <div className="relative grid items-center gap-6 overflow-hidden rounded-3xl bg-gradient-to-r from-brand-500 to-[#5BA0FF] px-6 py-10 md:grid-cols-[1fr_auto] md:px-12 md:py-12">
@@ -17,7 +17,7 @@ export function CtaBanner() {
             상담을 통해 아이에게 맞는 최적의 교육을 제안해드립니다.
           </p>
           <button
-            onClick={login.open}
+            onClick={contact.open}
             className="mt-6 inline-block rounded-md bg-white px-5 py-3 text-sm font-bold text-brand-500 hover:bg-brand-50"
           >
             상담문의 하기

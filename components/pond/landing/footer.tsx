@@ -1,10 +1,8 @@
 "use client";
 
 import { LogoMark } from "./header";
-import { useLogin } from "./landing-shell";
 
 export function LandingFooter() {
-  const login = useLogin();
   return (
     <footer className="border-t border-divider bg-[#FAFBFD]">
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-10 md:grid-cols-4 md:py-12">
@@ -12,10 +10,7 @@ export function LandingFooter() {
         <div>
           <div className="flex items-center gap-2.5">
             <LogoMark />
-            <div className="leading-tight">
-              <div className="text-[14px] font-bold tracking-tight">레티튜초등학교</div>
-              <div className="text-[10px] text-ink-tertiary">프리미엄 교육 파트너</div>
-            </div>
+            <span className="text-[14px] font-bold tracking-tight">레티튜초등학교</span>
           </div>
           <p className="mt-3 text-xs leading-relaxed text-ink-secondary">
             아이의 성장을 함께하는
@@ -38,12 +33,6 @@ export function LandingFooter() {
 
         <FooterColumn title="상담문의">
           <div className="text-base font-bold text-ink-primary">02-1234-5678</div>
-          <button
-            onClick={login.open}
-            className="mt-2 inline-block self-start rounded-md border border-brand-500 px-4 py-2 text-xs font-semibold text-brand-500 hover:bg-brand-50"
-          >
-            상담문의 하기
-          </button>
           <FooterLink href="#location">고객센터</FooterLink>
         </FooterColumn>
       </div>
