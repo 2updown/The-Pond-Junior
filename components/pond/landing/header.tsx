@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useLogin } from "./landing-shell";
+import { cn } from "@/lib/utils";
 
 export function LandingHeader() {
   const login = useLoginSafe();
@@ -17,11 +18,11 @@ export function LandingHeader() {
   }, [pathname]);
 
   const navLinks = [
-    { href: "#about", label: "학원소개" },
-    { href: "#programs", label: "프로그램" },
-    { href: "#gallery", label: "갤러리" },
-    { href: "#notices", label: "공지사항" },
-    { href: "#location", label: "오시는 길" },
+    { href: "/about", label: "학원소개" },
+    { href: "/programs", label: "프로그램" },
+    { href: "/gallery", label: "갤러리" },
+    { href: "/notices", label: "공지사항" },
+    { href: "/location", label: "오시는 길" },
   ];
 
   return (
@@ -39,24 +40,35 @@ export function LandingHeader() {
         {/* Desktop nav */}
         <nav className="hidden items-center gap-7 md:flex">
           {navLinks.map((n) => (
-            <a
+            <Link
               key={n.href}
               href={n.href}
-              className="text-[13px] font-medium text-ink-primary hover:text-brand-500"
+              className={cn(
+                "text-[13px] font-medium hover:text-brand-500",
+                pathname === n.href ? "text-brand-500" : "text-ink-primary"
+              )}
             >
               {n.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
           {loggedIn ? (
-            <Link
-              href="/consultations"
-              className="rounded-md bg-brand-500 px-4 py-2 text-[13px] font-semibold text-white hover:bg-brand-600"
-            >
-              관리페이지
-            </Link>
+            <>
+              <Link
+                href="/admin/notices"
+                className="hidden rounded-md border border-brand-500 px-3 py-2 text-[12.5px] font-semibold text-brand-500 hover:bg-brand-50 sm:inline-flex"
+              >
+                관리자 메뉴
+              </Link>
+              <Link
+                href="/consultations"
+                className="rounded-md bg-brand-500 px-3 py-2 text-[12.5px] font-semibold text-white hover:bg-brand-600 sm:inline-flex"
+              >
+                선생님 메뉴
+              </Link>
+            </>
           ) : (
             <button
               onClick={login?.open}
@@ -81,15 +93,36 @@ export function LandingHeader() {
           <ul className="mx-auto max-w-6xl px-5 py-3">
             {navLinks.map((n) => (
               <li key={n.href}>
-                <a
+                <Link
                   href={n.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block py-3 text-sm font-medium text-ink-primary"
+                  className={cn(
+                    "block py-3 text-sm font-medium",
+                    pathname === n.href ? "text-brand-500" : "text-ink-primary"
+                  )}
                 >
                   {n.label}
-                </a>
+                </Link>
               </li>
             ))}
+            {loggedIn && (
+              <li className="mt-2 grid grid-cols-2 gap-2 border-t border-divider pt-3">
+                <Link
+                  href="/admin/notices"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-md border border-brand-500 px-3 py-2 text-center text-[12.5px] font-semibold text-brand-500"
+                >
+                  관리자 메뉴
+                </Link>
+                <Link
+                  href="/consultations"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-md bg-brand-500 px-3 py-2 text-center text-[12.5px] font-semibold text-white"
+                >
+                  선생님 메뉴
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       )}

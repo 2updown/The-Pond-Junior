@@ -4,15 +4,24 @@ import * as React from "react";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "./sidebar";
 
+const PUBLIC_PATHS = new Set([
+  "/",
+  "/about",
+  "/programs",
+  "/gallery",
+  "/notices",
+  "/location",
+]);
+
 /**
- * Renders the persistent PC sidebar — but only on app routes (not landing or auth).
- * Mobile users see nothing here; they use the drawer instead.
+ * Renders the persistent PC sidebar only for app routes (teacher / admin).
+ * Public landing pages and login flow show nothing here.
  */
 export function AppChrome() {
   const pathname = usePathname() || "";
-  const isLanding = pathname === "/";
+  const isPublic = PUBLIC_PATHS.has(pathname);
   const isAuth = pathname.startsWith("/login");
 
-  if (isLanding || isAuth) return null;
+  if (isPublic || isAuth) return null;
   return <Sidebar />;
 }

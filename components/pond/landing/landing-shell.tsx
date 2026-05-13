@@ -3,12 +3,8 @@
 import * as React from "react";
 import { LandingHeader } from "./header";
 import { Hero } from "./hero";
-import { Features } from "./features";
-import { Programs } from "./programs";
-import { Gallery } from "./gallery";
-import { NoticeBoard } from "./notice-board";
+import { HomeTeaser } from "./home-teaser";
 import { CtaBanner } from "./cta-banner";
-import { Location } from "./location";
 import { LandingFooter } from "./footer";
 import { LoginModal } from "./login-modal";
 
@@ -24,7 +20,12 @@ export function useLogin() {
   return ctx;
 }
 
-export function LandingShell() {
+interface LandingShellProps {
+  /** Optional content to render between header and footer. Falls back to home sections. */
+  children?: React.ReactNode;
+}
+
+export function LandingShell({ children }: LandingShellProps) {
   const [loginOpen, setLoginOpen] = React.useState(false);
   const open = React.useCallback(() => setLoginOpen(true), []);
   const close = React.useCallback(() => setLoginOpen(false), []);
@@ -34,13 +35,13 @@ export function LandingShell() {
       <div className="min-h-screen bg-white">
         <LandingHeader />
         <main>
-          <Hero />
-          <Features />
-          <Programs />
-          <Gallery />
-          <NoticeBoard />
-          <CtaBanner />
-          <Location />
+          {children ?? (
+            <>
+              <Hero />
+              <HomeTeaser />
+              <CtaBanner />
+            </>
+          )}
         </main>
         <LandingFooter />
       </div>
