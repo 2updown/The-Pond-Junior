@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
-import { Menu, ChevronLeft, LogOut } from "lucide-react";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
+import { Menu, ChevronLeft, LogOut, Shield, UserCog } from "lucide-react";
 import { useDrawer } from "./drawer";
 
 interface TopbarProps {
@@ -18,7 +19,13 @@ interface TopbarProps {
 
 export function Topbar({ title, variant = "menu", right, onBack }: TopbarProps) {
   const router = useRouter();
+  const pathname = usePathname() || "";
   const { open } = useDrawer();
+
+  const isAdminMode = pathname.startsWith("/admin");
+  const modeTargetHref = isAdminMode ? "/consultations" : "/admin/notices";
+  const ModeIcon = isAdminMode ? UserCog : Shield;
+  const modeLabel = isAdminMode ? "선생님 모드 전환" : "관리자 모드 전환";
 
   const handleLeft = () => {
     if (variant === "menu") open();
@@ -54,7 +61,14 @@ export function Topbar({ title, variant = "menu", right, onBack }: TopbarProps) 
 
       <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 md:right-8 md:gap-2">
         {right}
-        {/* PC-only logout */}
+        {/* PC-only: mode toggle + logout */}
+        <Link
+          href={modeTargetHref}
+          className="hidden items-center gap-1.5 rounded-md border border-divider bg-white px-3 py-2 text-sm font-medium text-ink-primary hover:bg-muted md:flex"
+        >
+          <ModeIcon className="h-4 w-4" />
+          {modeLabel}
+        </Link>
         <button
           onClick={handleLogout}
           className="ml-1 hidden items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-ink-primary hover:bg-muted md:flex"

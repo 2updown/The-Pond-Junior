@@ -16,13 +16,6 @@ export interface MenuCategory {
 
 export const MENU: MenuCategory[] = [
   {
-    id: "dashboard",
-    label: "홈으로",
-    items: [
-      { label: "홈으로 (학원 소개)", href: "/", match: ["/landing"] },
-    ],
-  },
-  {
     id: "members",
     label: "회원관리",
     items: [
@@ -169,7 +162,7 @@ export function findActiveCategory(pathname: string, tab?: string | null): strin
       if (matchList.some((m) => pathname.startsWith(m))) return cat.id;
     }
   }
-  return "dashboard";
+  return MENU[0]?.id || "";
 }
 
 export function isActiveItem(

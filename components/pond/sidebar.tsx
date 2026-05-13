@@ -16,9 +16,6 @@ import {
   Star,
   Headphones,
   User,
-  Home,
-  Shield,
-  UserCog,
   Settings,
   Smartphone,
   ArrowLeftRight,
@@ -39,7 +36,6 @@ import {
 import { ADMIN_MENU, findAdminActiveItem } from "./admin-menu-config";
 
 const TEACHER_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  dashboard: Home,
   members: Users,
   classes: BookOpen,
   learning: GraduationCap,
@@ -59,46 +55,18 @@ export function Sidebar() {
 
   return (
     <aside className="fixed left-0 top-0 bottom-0 z-40 hidden w-[240px] flex-col border-r border-divider bg-white md:flex">
-      {/* Logo */}
+      {/* Logo — always returns to landing */}
       <Link
-        href={isAdminMode ? "/admin/notices" : "/consultations"}
+        href="/"
         className="flex items-center gap-2.5 border-b border-divider px-5 py-5"
       >
         <LogoMark />
-        <div className="leading-tight">
-          <div className="text-[14px] font-bold tracking-tight">레티튜초등학교</div>
-          <div className="text-[10px] text-ink-tertiary">
-            {isAdminMode ? "관리자 페이지" : "관리 페이지"}
-          </div>
-        </div>
+        <span className="text-[14px] font-bold tracking-tight">레티튜초등학교</span>
       </Link>
-
-      {/* Mode toggle */}
-      <ModeToggle isAdminMode={isAdminMode} />
 
       {/* Menu */}
       {isAdminMode ? <AdminMenu pathname={pathname} /> : <TeacherMenu pathname={pathname} />}
     </aside>
-  );
-}
-
-function ModeToggle({ isAdminMode }: { isAdminMode: boolean }) {
-  const targetHref = isAdminMode ? "/consultations" : "/admin/notices";
-  const Icon = isAdminMode ? UserCog : Shield;
-  const label = isAdminMode ? "선생님 모드로 전환" : "관리자 모드 전환";
-  return (
-    <Link
-      href={targetHref}
-      className={cn(
-        "mx-3 mt-3 flex items-center gap-2 rounded-md px-3 py-2 text-[12.5px] font-semibold transition-colors",
-        isAdminMode
-          ? "bg-brand-50 text-brand-600 hover:bg-brand-100"
-          : "bg-[#FDF2F4] text-[#C2185B] hover:bg-[#FCE4EC]"
-      )}
-    >
-      <Icon className="h-4 w-4 flex-none" />
-      <span className="flex-1">{label}</span>
-    </Link>
   );
 }
 
