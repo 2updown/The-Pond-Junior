@@ -24,17 +24,12 @@ export function ScheduleStrip() {
   return (
     <section className="bg-white py-12 md:py-16" id="schedule">
       <div className="mx-auto max-w-6xl px-5">
-        <div className="mb-8 flex items-end justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-brand-500">
-              <Calendar className="h-4 w-4" />
-              <span className="text-xs font-semibold uppercase tracking-wider">Schedule</span>
-            </div>
-            <h2 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">학원 일정표</h2>
+        <div className="mb-8">
+          <div className="flex items-center gap-2 text-brand-500">
+            <Calendar className="h-4 w-4" />
+            <span className="text-xs font-semibold uppercase tracking-wider">Schedule</span>
           </div>
-          <div className="hidden text-xs text-ink-tertiary md:block">
-            선생님이 등록한 학사 · 행사 · 휴원 일정
-          </div>
+          <h2 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">학원 일정표</h2>
         </div>
 
         {events.length === 0 ? (

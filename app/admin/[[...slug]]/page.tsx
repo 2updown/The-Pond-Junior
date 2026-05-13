@@ -23,19 +23,12 @@ export default function AdminCatchAllPage() {
 
   const match = findAdminActiveItem(pathname);
   const title = match?.itemLabel || "관리자";
-  const categoryLabel = match?.categoryLabel || "";
 
   return (
     <>
       <Topbar title={title} />
       <AppShell hideBottomNav>
-        {categoryLabel && (
-          <div className="px-1 text-xs font-semibold text-ink-tertiary">
-            {categoryLabel}
-          </div>
-        )}
-
-        <div className="flex flex-col items-center py-16 text-center md:py-24">
+        <div className="flex flex-col items-center py-8 text-center md:py-12">
           <div className="empty-illustration mb-6">
             <Construction className="h-9 w-9 text-brand-500" strokeWidth={2} />
           </div>

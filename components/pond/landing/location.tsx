@@ -2,10 +2,7 @@ import { MapPin, Phone, Mail, Clock } from "lucide-react";
 
 export function Location() {
   return (
-    <section className="mx-auto max-w-6xl px-5 py-16 md:py-20" id="location">
-      <div className="mb-12 text-center">
-        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">오시는 길</h2>
-      </div>
+    <section className="mx-auto max-w-6xl px-5 py-10 md:py-12" id="location">
       <div className="grid gap-6 md:grid-cols-2">
         {/* Map placeholder */}
         <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#E8EFF6] md:aspect-auto">

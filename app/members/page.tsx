@@ -105,7 +105,7 @@ export default function MembersPage() {
                 className="flex-1 bg-transparent text-sm outline-none placeholder:text-ink-tertiary"
               />
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
               {filteredStudents.map((s) => (
                 <div key={s.id} className="pond-card flex items-center gap-3.5">
                   <Avatar initial={s.initial} color={s.color} />

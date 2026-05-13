@@ -11,7 +11,7 @@ interface AppShellProps {
 export function AppShell({ children, className }: AppShellProps) {
   return (
     <div className={cn("app-shell", className)}>
-      <div className="flex flex-1 flex-col gap-3.5 px-5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-6 md:pb-12">
+      <div className="mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-3.5 px-5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-6 md:pb-12 lg:px-10">
         {children}
       </div>
     </div>

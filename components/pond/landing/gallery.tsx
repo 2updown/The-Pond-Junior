@@ -18,18 +18,12 @@ export function Gallery() {
   const loggedIn = useLoginState();
 
   return (
-    <section className="mx-auto max-w-6xl px-5 py-16 md:py-20" id="gallery">
-      <div className="mb-10 flex flex-col items-center text-center md:mb-12">
-        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">레티튜 갤러리</h2>
-        <p className="mt-3 text-sm text-ink-secondary">
-          아이들의 즐거운 수업 모습과 다양한 활동을 확인해보세요.
-        </p>
-        {loggedIn && (
-          <div className="mt-5">
-            <WriteButton defaultKind="photo" />
-          </div>
-        )}
-      </div>
+    <section className="mx-auto max-w-6xl px-5 py-10 md:py-12" id="gallery">
+      {loggedIn && (
+        <div className="mb-8 flex justify-end">
+          <WriteButton defaultKind="photo" />
+        </div>
+      )}
 
       {photos.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-divider bg-white py-16 text-center text-sm text-ink-tertiary">

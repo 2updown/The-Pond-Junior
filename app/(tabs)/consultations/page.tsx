@@ -64,30 +64,32 @@ export default function ConsultationsPage() {
               <div className="px-1 pt-1 text-xs font-semibold text-ink-tertiary">
                 {formatDate(date)}
               </div>
-              {items.map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/consultation/${c.id}`}
-                  className="pond-card flex flex-col gap-1.5"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold text-ink-primary">
-                      {c.startTime} – {c.endTime}
-                    </span>
-                    <Chip variant={c.status === "scheduled" ? "scheduled" : c.status === "done" ? "done" : "canceled"}>
-                      {c.status === "scheduled" ? "예정" : c.status === "done" ? "완료" : "취소"}
-                    </Chip>
-                  </div>
-                  <div className="text-[13px] font-medium text-ink-primary">
-                    {c.studentName}
-                    <span className="mx-1.5 text-ink-tertiary">·</span>
-                    {c.subject}
-                    <span className="mx-1.5 text-ink-tertiary">·</span>
-                    {c.mode === "online" ? "온라인" : "대면"}
-                  </div>
-                  {c.note && <div className="text-xs text-ink-secondary">{c.note}</div>}
-                </Link>
-              ))}
+              <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-3">
+                {items.map((c) => (
+                  <Link
+                    key={c.id}
+                    href={`/consultation/${c.id}`}
+                    className="pond-card flex flex-col gap-1.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold text-ink-primary">
+                        {c.startTime} – {c.endTime}
+                      </span>
+                      <Chip variant={c.status === "scheduled" ? "scheduled" : c.status === "done" ? "done" : "canceled"}>
+                        {c.status === "scheduled" ? "예정" : c.status === "done" ? "완료" : "취소"}
+                      </Chip>
+                    </div>
+                    <div className="text-[13px] font-medium text-ink-primary">
+                      {c.studentName}
+                      <span className="mx-1.5 text-ink-tertiary">·</span>
+                      {c.subject}
+                      <span className="mx-1.5 text-ink-tertiary">·</span>
+                      {c.mode === "online" ? "온라인" : "대면"}
+                    </div>
+                    {c.note && <div className="text-xs text-ink-secondary">{c.note}</div>}
+                  </Link>
+                ))}
+              </div>
             </React.Fragment>
           ))}
         </div>

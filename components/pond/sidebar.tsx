@@ -23,7 +23,6 @@ import {
   Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { LogoMark } from "./landing/header";
 import {
   MENU as TEACHER_MENU,
   findActiveCategory,
@@ -54,17 +53,7 @@ export function Sidebar() {
   const isAdminMode = pathname.startsWith("/admin");
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 z-40 hidden w-[240px] flex-col border-r border-divider bg-white md:flex">
-      {/* Logo — always returns to landing */}
-      <Link
-        href="/"
-        className="flex items-center gap-2.5 border-b border-divider px-5 py-5"
-      >
-        <LogoMark />
-        <span className="text-[14px] font-bold tracking-tight">레티튜초등학교</span>
-      </Link>
-
-      {/* Menu */}
+    <aside className="fixed left-0 top-16 bottom-0 z-40 hidden w-[240px] flex-col border-r border-divider bg-white md:flex">
       {isAdminMode ? <AdminMenu pathname={pathname} /> : <TeacherMenu pathname={pathname} />}
     </aside>
   );

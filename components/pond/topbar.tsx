@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
-import { Menu, ChevronLeft, LogOut, Shield, UserCog } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Menu, ChevronLeft } from "lucide-react";
 import { useDrawer } from "./drawer";
 
 interface TopbarProps {
@@ -11,33 +10,20 @@ interface TopbarProps {
   variant?: "menu" | "back";
   right?: React.ReactNode;
   onBack?: () => void;
-  /** @deprecated 글쓰기 버튼은 더 이상 Topbar에 렌더되지 않습니다 (랜딩 섹션으로 이동). */
+  /** @deprecated kept for compat */
   hideWriteButton?: boolean;
-  /** @deprecated Topbar 글쓰기 버튼은 제거됨. */
+  /** @deprecated kept for compat */
   writeKind?: string;
 }
 
 export function Topbar({ title, variant = "menu", right, onBack }: TopbarProps) {
   const router = useRouter();
-  const pathname = usePathname() || "";
   const { open } = useDrawer();
-
-  const isAdminMode = pathname.startsWith("/admin");
-  const modeTargetHref = isAdminMode ? "/consultations" : "/admin/notices";
-  const ModeIcon = isAdminMode ? UserCog : Shield;
-  const modeLabel = isAdminMode ? "선생님 모드 전환" : "관리자 모드 전환";
 
   const handleLeft = () => {
     if (variant === "menu") open();
     else if (onBack) onBack();
     else router.back();
-  };
-
-  const handleLogout = () => {
-    if (confirm("로그아웃 하시겠어요?")) {
-      localStorage.removeItem("pond_logged_in");
-      router.push("/");
-    }
   };
 
   return (
@@ -59,24 +45,11 @@ export function Topbar({ title, variant = "menu", right, onBack }: TopbarProps) 
         {title}
       </span>
 
-      <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 md:right-8 md:gap-2">
-        {right}
-        {/* PC-only: mode toggle + logout */}
-        <Link
-          href={modeTargetHref}
-          className="hidden items-center gap-1.5 rounded-md border border-divider bg-white px-3 py-2 text-sm font-medium text-ink-primary hover:bg-muted md:flex"
-        >
-          <ModeIcon className="h-4 w-4" />
-          {modeLabel}
-        </Link>
-        <button
-          onClick={handleLogout}
-          className="ml-1 hidden items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-ink-primary hover:bg-muted md:flex"
-        >
-          <LogOut className="h-4 w-4" />
-          로그아웃
-        </button>
-      </div>
+      {right && (
+        <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 md:right-8 md:gap-2">
+          {right}
+        </div>
+      )}
     </div>
   );
 }

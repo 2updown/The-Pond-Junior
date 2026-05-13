@@ -42,7 +42,7 @@ export default function TodosPage() {
           onChange={setTab}
         />
 
-        <div className="flex flex-col gap-3.5">
+        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-3">
           {list.map((todo) => {
             const ratio = todo.total > 0 ? (todo.submitted / todo.total) * 100 : 0;
             const fullyDone = todo.submitted === todo.total && todo.total > 0;

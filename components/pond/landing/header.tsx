@@ -17,6 +17,14 @@ export function LandingHeader() {
     setLoggedIn(typeof window !== "undefined" && localStorage.getItem("pond_logged_in") === "true");
   }, [pathname]);
 
+  const handleLogout = () => {
+    if (confirm("로그아웃 하시겠어요?")) {
+      localStorage.removeItem("pond_logged_in");
+      setLoggedIn(false);
+      setMobileOpen(false);
+    }
+  };
+
   const navLinks = [
     { href: "/about", label: "학원소개" },
     { href: "/programs", label: "프로그램" },
@@ -65,6 +73,12 @@ export function LandingHeader() {
               >
                 선생님 메뉴
               </Link>
+              <button
+                onClick={handleLogout}
+                className="hidden rounded-md px-3 py-2 text-[12.5px] font-semibold text-ink-secondary hover:bg-muted hover:text-ink-primary sm:inline-flex"
+              >
+                로그아웃
+              </button>
             </>
           ) : (
             <button
@@ -103,22 +117,32 @@ export function LandingHeader() {
               </li>
             ))}
             {loggedIn && (
-              <li className="mt-2 grid grid-cols-2 gap-2 border-t border-divider pt-3">
-                <Link
-                  href="/admin/notices"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-md border border-brand-500 px-3 py-2 text-center text-[12.5px] font-semibold text-brand-500"
-                >
-                  관리자 메뉴
-                </Link>
-                <Link
-                  href="/consultations"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-md bg-brand-500 px-3 py-2 text-center text-[12.5px] font-semibold text-white"
-                >
-                  선생님 메뉴
-                </Link>
-              </li>
+              <>
+                <li className="mt-2 grid grid-cols-2 gap-2 border-t border-divider pt-3">
+                  <Link
+                    href="/admin/notices"
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-md border border-brand-500 px-3 py-2 text-center text-[12.5px] font-semibold text-brand-500"
+                  >
+                    관리자 메뉴
+                  </Link>
+                  <Link
+                    href="/consultations"
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-md bg-brand-500 px-3 py-2 text-center text-[12.5px] font-semibold text-white"
+                  >
+                    선생님 메뉴
+                  </Link>
+                </li>
+                <li className="mt-2">
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full rounded-md px-3 py-2 text-center text-[12.5px] font-semibold text-ink-secondary hover:bg-muted"
+                  >
+                    로그아웃
+                  </button>
+                </li>
+              </>
             )}
           </ul>
         </nav>

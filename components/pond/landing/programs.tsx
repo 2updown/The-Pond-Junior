@@ -48,20 +48,12 @@ export function Programs() {
               </div>
               <div className="p-5">
                 <h3 className="mb-2 text-base font-bold">{p.name}</h3>
-                <p className="mb-4 text-xs leading-relaxed text-ink-secondary">
+                <p className="text-xs leading-relaxed text-ink-secondary">
                   {p.description}
                 </p>
-                <button className="text-[13px] font-semibold text-brand-500 hover:text-brand-600">
-                  자세히 보기 →
-                </button>
               </div>
             </div>
           ))}
-        </div>
-        <div className="mt-10 text-center">
-          <button className="rounded-md border border-divider bg-white px-6 py-3 text-sm font-semibold text-ink-primary hover:bg-muted">
-            전체 프로그램 보기
-          </button>
         </div>
       </div>
     </section>

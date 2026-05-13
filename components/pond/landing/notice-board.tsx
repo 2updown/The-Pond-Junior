@@ -11,19 +11,13 @@ export function NoticeBoard() {
   const loggedIn = useLoginState();
 
   return (
-    <section className="bg-[#FAFBFD] py-16 md:py-20" id="notices">
+    <section className="bg-[#FAFBFD] py-10 md:py-12" id="notices">
       <div className="mx-auto max-w-4xl px-5">
-        <div className="mb-10 flex flex-col items-center text-center md:mb-12">
-          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">공지사항</h2>
-          <p className="mt-3 text-sm text-ink-secondary">
-            학원의 최신 소식과 중요한 안내를 확인하세요.
-          </p>
-          {loggedIn && (
-            <div className="mt-5">
-              <WriteButton defaultKind="notice" />
-            </div>
-          )}
-        </div>
+        {loggedIn && (
+          <div className="mb-6 flex justify-end">
+            <WriteButton defaultKind="notice" />
+          </div>
+        )}
         <div className="overflow-hidden rounded-2xl border border-divider bg-white">
           {notices.length === 0 && (
             <div className="px-5 py-10 text-center text-sm text-ink-tertiary">

@@ -96,9 +96,12 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
         )}
 
         {/* Logo header */}
-        <div className="mb-6 flex flex-col items-center pt-1">
-          <PondLogo />
-          <div className="mt-2 text-base font-bold tracking-tight">The Pond</div>
+        <div className="mb-6 flex justify-center pt-1">
+          <img
+            src="/images/Pond-logo.png"
+            alt="The Pond"
+            className="h-24 w-auto object-contain"
+          />
         </div>
 
         {step === "email" && (
@@ -344,25 +347,3 @@ function PasswordStep({
   );
 }
 
-function PondLogo() {
-  return (
-    <svg viewBox="0 0 80 40" className="h-10 w-20" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="pond-logo-grad" x1="0" y1="0" x2="80" y2="0" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#3E8BFF" />
-          <stop offset="0.5" stopColor="#A78BFA" />
-          <stop offset="1" stopColor="#EC4899" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M6 22 C 14 8, 22 8, 30 22 S 46 36, 54 22 S 70 8, 74 14"
-        stroke="url(#pond-logo-grad)"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-      <circle cx="74" cy="14" r="3" fill="#EC4899" />
-    </svg>
-  );
-}

@@ -104,19 +104,17 @@
   }
 }
 
-/* PC layout: sidebar takes left 240px, app-shell fills the rest */
+/* PC layout: global GNB (64px) on top, sidebar (240px) on left, app-shell fills the rest */
 @media (min-width: 768px) {
   .app-shell {
     margin-left: 240px;
     margin-right: 0;
     max-width: none;
+    width: calc(100% - 240px); /* compensate for fixed sidebar */
     box-shadow: none;
+    min-height: calc(100vh - 64px); /* compensate for GNB */
   }
   .topbar {
-    justify-content: flex-start;
-    background: #ffffff;
-    border-bottom: 1px solid hsl(var(--divider));
-    padding: 20px 32px;
-    min-height: 64px;
+    display: none;
   }
 }

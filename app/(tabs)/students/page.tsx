@@ -43,7 +43,7 @@ export default function StudentsPage() {
           />
         </div>
 
-        <div className="flex flex-col gap-3.5">
+        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((s) => (
             <Link
               key={s.id}

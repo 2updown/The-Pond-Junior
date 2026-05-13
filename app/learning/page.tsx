@@ -42,7 +42,7 @@ export default function LearningPage() {
 
         {tab === "homework" && (
           <div className="flex flex-col gap-3.5">
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
               <div className="pond-card">
                 <div className="text-[11px] font-semibold text-ink-secondary">진행 중 숙제</div>
                 <div className="text-xl font-bold">12</div>
@@ -52,6 +52,7 @@ export default function LearningPage() {
                 <div className="text-xl font-bold">68%</div>
               </div>
             </div>
+            <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-3">
             {TODOS_ACTIVE.map((t) => {
               const ratio = (t.submitted / t.total) * 100;
               const full = t.submitted === t.total;
@@ -75,6 +76,7 @@ export default function LearningPage() {
                 </div>
               );
             })}
+            </div>
             <InfoBox>숙제 출제·검사·삭제는 PC에서 진행해주세요.</InfoBox>
           </div>
         )}

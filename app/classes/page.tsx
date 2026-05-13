@@ -25,7 +25,7 @@ export default function ClassesPage() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           {CLASSES.map((c) => {
             const full = c.current >= c.capacity;
             return (
