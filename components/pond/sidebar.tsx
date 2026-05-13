@@ -17,11 +17,18 @@ import {
   Headphones,
   User,
   Home,
+  Shield,
+  UserCog,
+  Settings,
+  Smartphone,
+  ArrowLeftRight,
+  BarChart3,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogoMark } from "./landing/header";
 import {
-  MENU,
+  MENU as TEACHER_MENU,
   findActiveCategory,
   isActiveItem,
   isSingleItemCategory,
@@ -29,8 +36,9 @@ import {
   type MenuCategory,
   type MenuItem,
 } from "./menu-config";
+import { ADMIN_MENU, findAdminActiveItem } from "./admin-menu-config";
 
-const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+const TEACHER_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   dashboard: Home,
   members: Users,
   classes: BookOpen,
@@ -46,10 +54,60 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export function Sidebar() {
-  const router = useRouter();
   const pathname = usePathname() || "/";
+  const isAdminMode = pathname.startsWith("/admin");
+
+  return (
+    <aside className="fixed left-0 top-0 bottom-0 z-40 hidden w-[240px] flex-col border-r border-divider bg-white md:flex">
+      {/* Logo */}
+      <Link
+        href={isAdminMode ? "/admin/notices" : "/consultations"}
+        className="flex items-center gap-2.5 border-b border-divider px-5 py-5"
+      >
+        <LogoMark />
+        <div className="leading-tight">
+          <div className="text-[14px] font-bold tracking-tight">레티튜초등학교</div>
+          <div className="text-[10px] text-ink-tertiary">
+            {isAdminMode ? "관리자 페이지" : "관리 페이지"}
+          </div>
+        </div>
+      </Link>
+
+      {/* Mode toggle */}
+      <ModeToggle isAdminMode={isAdminMode} />
+
+      {/* Menu */}
+      {isAdminMode ? <AdminMenu pathname={pathname} /> : <TeacherMenu pathname={pathname} />}
+    </aside>
+  );
+}
+
+function ModeToggle({ isAdminMode }: { isAdminMode: boolean }) {
+  const targetHref = isAdminMode ? "/consultations" : "/admin/notices";
+  const Icon = isAdminMode ? UserCog : Shield;
+  const label = isAdminMode ? "선생님 모드로 전환" : "관리자 모드 전환";
+  return (
+    <Link
+      href={targetHref}
+      className={cn(
+        "mx-3 mt-3 flex items-center gap-2 rounded-md px-3 py-2 text-[12.5px] font-semibold transition-colors",
+        isAdminMode
+          ? "bg-brand-50 text-brand-600 hover:bg-brand-100"
+          : "bg-[#FDF2F4] text-[#C2185B] hover:bg-[#FCE4EC]"
+      )}
+    >
+      <Icon className="h-4 w-4 flex-none" />
+      <span className="flex-1">{label}</span>
+    </Link>
+  );
+}
+
+/* ─── Teacher menu (collapsible) ─── */
+
+function TeacherMenu({ pathname }: { pathname: string }) {
   const searchParams = useSearchParams();
   const tab = searchParams?.get("tab") || null;
+  const router = useRouter();
   const activeCategoryId = findActiveCategory(pathname, tab);
 
   const [expanded, setExpanded] = React.useState<Set<string>>(
@@ -72,32 +130,18 @@ export function Sidebar() {
     });
   };
 
-  // 화면 표시 순서: 홈 + 메인 카테고리들 + 마지막에 계정(정보 수정)을 따로
-  const mainCategories = MENU.filter((c) => c.id !== "account");
-  const accountCategory = MENU.find((c) => c.id === "account");
+  const mainCategories = TEACHER_MENU.filter((c) => c.id !== "account");
+  const accountCategory = TEACHER_MENU.find((c) => c.id === "account");
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 z-40 hidden w-[240px] flex-col border-r border-divider bg-white md:flex">
-      {/* Logo */}
-      <Link
-        href="/"
-        className="flex items-center gap-2.5 border-b border-divider px-5 py-5"
-      >
-        <LogoMark />
-        <div className="leading-tight">
-          <div className="text-[14px] font-bold tracking-tight">레티튜초등학교</div>
-          <div className="text-[10px] text-ink-tertiary">관리 페이지</div>
-        </div>
-      </Link>
-
-      {/* Categories */}
+    <>
       <nav className="flex-1 overflow-y-auto py-3">
         <ul className="flex flex-col">
           {mainCategories.map((cat) => (
             <SidebarCategoryRow
               key={cat.id}
               category={cat}
-              Icon={ICONS[cat.id] || User}
+              Icon={TEACHER_ICONS[cat.id] || User}
               isActive={cat.id === activeCategoryId}
               isExpanded={expanded.has(cat.id)}
               pathname={pathname}
@@ -109,12 +153,11 @@ export function Sidebar() {
         </ul>
       </nav>
 
-      {/* Account (정보 수정) — separated at bottom */}
       {accountCategory && (
         <div className="border-t border-divider py-2">
           <SidebarCategoryRow
             category={accountCategory}
-            Icon={ICONS[accountCategory.id] || User}
+            Icon={TEACHER_ICONS[accountCategory.id] || User}
             isActive={accountCategory.id === activeCategoryId}
             isExpanded={expanded.has(accountCategory.id)}
             pathname={pathname}
@@ -124,7 +167,7 @@ export function Sidebar() {
           />
         </div>
       )}
-    </aside>
+    </>
   );
 }
 
@@ -136,7 +179,6 @@ function SidebarCategoryRow({
   pathname,
   tab,
   onToggle,
-  router,
 }: {
   category: MenuCategory;
   Icon: React.ComponentType<{ className?: string }>;
@@ -149,7 +191,6 @@ function SidebarCategoryRow({
 }) {
   const single = isSingleItemCategory(category);
 
-  // Single-item category: render as direct link
   if (single) {
     const href = category.items[0].href || "#";
     return (
@@ -158,9 +199,7 @@ function SidebarCategoryRow({
           href={href}
           className={cn(
             "flex items-center gap-2.5 px-5 py-2.5 text-[13px] font-medium transition-colors",
-            isActive
-              ? "bg-brand-50 text-brand-600"
-              : "text-ink-primary hover:bg-muted"
+            isActive ? "bg-brand-50 text-brand-600" : "text-ink-primary hover:bg-muted"
           )}
         >
           <Icon className="h-4 w-4 flex-none" />
@@ -170,16 +209,13 @@ function SidebarCategoryRow({
     );
   }
 
-  // Multi-item category: collapsible
   return (
     <li>
       <button
         onClick={onToggle}
         className={cn(
           "flex w-full items-center gap-2.5 px-5 py-2.5 text-left text-[13px] font-medium transition-colors",
-          isActive
-            ? "text-brand-600"
-            : "text-ink-primary hover:bg-muted"
+          isActive ? "text-brand-600" : "text-ink-primary hover:bg-muted"
         )}
       >
         <Icon className={cn("h-4 w-4 flex-none", isActive && "text-brand-500")} />
@@ -231,9 +267,7 @@ function SidebarSubItem({
           onClick={() => setOpen((v) => !v)}
           className={cn(
             "flex w-full items-center justify-between gap-2 py-2 pl-12 pr-4 text-left text-[12.5px] transition-colors",
-            active
-              ? "font-bold text-brand-600"
-              : "text-ink-primary hover:bg-[#EDF1FA]"
+            active ? "font-bold text-brand-600" : "text-ink-primary hover:bg-[#EDF1FA]"
           )}
         >
           <span>{item.label}</span>
@@ -273,7 +307,6 @@ function SidebarSubItem({
     );
   }
 
-  // leaf
   return (
     <li>
       {item.href ? (
@@ -281,9 +314,7 @@ function SidebarSubItem({
           href={item.href}
           className={cn(
             "block py-2 pl-12 pr-4 text-[12.5px] transition-colors",
-            active
-              ? "font-bold text-brand-600"
-              : "text-ink-primary hover:bg-[#EDF1FA]"
+            active ? "font-bold text-brand-600" : "text-ink-primary hover:bg-[#EDF1FA]"
           )}
         >
           {item.label}
@@ -294,5 +325,61 @@ function SidebarSubItem({
         </span>
       )}
     </li>
+  );
+}
+
+/* ─── Admin menu (collapsible accordion, same UI as teacher) ─── */
+
+const ADMIN_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  "admin-notices": Megaphone,
+  "admin-basic": Settings,
+  "admin-mobile": Smartphone,
+  "admin-checkin": ArrowLeftRight,
+  "admin-stats": BarChart3,
+};
+
+function AdminMenu({ pathname }: { pathname: string }) {
+  const active = findAdminActiveItem(pathname);
+  const activeCategoryId = active?.categoryId || ADMIN_MENU[0].id;
+  const router = useRouter();
+
+  const [expanded, setExpanded] = React.useState<Set<string>>(
+    () => new Set([activeCategoryId])
+  );
+
+  React.useEffect(() => {
+    setExpanded((prev) => {
+      if (prev.has(activeCategoryId)) return prev;
+      return new Set([...prev, activeCategoryId]);
+    });
+  }, [activeCategoryId]);
+
+  const toggle = (id: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  return (
+    <nav className="flex-1 overflow-y-auto py-3">
+      <ul className="flex flex-col">
+        {ADMIN_MENU.map((cat) => (
+          <SidebarCategoryRow
+            key={cat.id}
+            category={cat}
+            Icon={ADMIN_ICONS[cat.id] || Settings}
+            isActive={cat.id === activeCategoryId}
+            isExpanded={expanded.has(cat.id)}
+            pathname={pathname}
+            tab={null}
+            onToggle={() => toggle(cat.id)}
+            router={router}
+          />
+        ))}
+      </ul>
+    </nav>
   );
 }
