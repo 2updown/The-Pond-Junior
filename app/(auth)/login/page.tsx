@@ -14,7 +14,7 @@ export default function LoginPage() {
     e?.preventDefault();
     if (!valid) return;
     sessionStorage.setItem("pond_email", email.trim());
-    router.push("/login/code");
+    router.push("/login/password");
   };
 
   return (

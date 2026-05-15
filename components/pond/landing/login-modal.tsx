@@ -2,10 +2,12 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { X, Check, ChevronLeft } from "lucide-react";
+import { X, ChevronLeft, Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Step = "email" | "code" | "password";
+// "code" (OTP) step is intentionally removed — see CodeStep below for the
+// previous implementation, kept for reference when OTP is re-introduced.
+type Step = "email" | "password";
 
 interface LoginModalProps {
   open: boolean;
@@ -16,20 +18,14 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
   const router = useRouter();
   const [step, setStep] = React.useState<Step>("email");
   const [email, setEmail] = React.useState("");
-  const [code, setCode] = React.useState(["", "", "", "", "", ""]);
-  const [remain, setRemain] = React.useState(600);
-  const [pw1, setPw1] = React.useState("");
-  const [pw2, setPw2] = React.useState("");
+  const [password, setPassword] = React.useState("");
 
   // Reset state when modal opens
   React.useEffect(() => {
     if (open) {
       setStep("email");
       setEmail("");
-      setCode(["", "", "", "", "", ""]);
-      setRemain(600);
-      setPw1("");
-      setPw2("");
+      setPassword("");
     }
   }, [open]);
 
@@ -48,19 +44,14 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
     };
   }, [open, onClose]);
 
-  // Timer for code step
-  React.useEffect(() => {
-    if (step !== "code" || remain <= 0) return;
-    const t = setInterval(() => setRemain((r) => r - 1), 1000);
-    return () => clearInterval(t);
-  }, [step, remain]);
-
   if (!open) return null;
 
   const handlePasswordSubmit = () => {
+    if (!password.trim()) return;
+    // Demo-only — any non-empty password is accepted. Replace with real auth.
     localStorage.setItem("pond_logged_in", "true");
     onClose();
-    router.push("/consultations?toast=password-changed");
+    router.push("/consultations");
   };
 
   return (
@@ -84,10 +75,10 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
           <X className="h-5 w-5" />
         </button>
 
-        {/* Back button (steps 2-3) */}
+        {/* Back button (only on password step now that OTP is removed) */}
         {step !== "email" && (
           <button
-            onClick={() => setStep(step === "password" ? "code" : "email")}
+            onClick={() => setStep("email")}
             aria-label="이전"
             className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg text-ink-secondary hover:bg-muted"
           >
@@ -108,25 +99,14 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
           <EmailStep
             email={email}
             setEmail={setEmail}
-            onNext={() => email.trim() && setStep("code")}
-          />
-        )}
-        {step === "code" && (
-          <CodeStep
-            email={email}
-            code={code}
-            setCode={setCode}
-            remain={remain}
-            onResend={() => setRemain(600)}
-            onNext={() => setStep("password")}
+            onNext={() => email.trim() && setStep("password")}
           />
         )}
         {step === "password" && (
           <PasswordStep
-            pw1={pw1}
-            pw2={pw2}
-            setPw1={setPw1}
-            setPw2={setPw2}
+            email={email}
+            password={password}
+            setPassword={setPassword}
             onSubmit={handlePasswordSubmit}
           />
         )}
@@ -284,55 +264,80 @@ function CodeStep({
 }
 
 function PasswordStep({
-  pw1,
-  pw2,
-  setPw1,
-  setPw2,
+  email,
+  password,
+  setPassword,
   onSubmit,
 }: {
-  pw1: string;
-  pw2: string;
-  setPw1: (v: string) => void;
-  setPw2: (v: string) => void;
+  email: string;
+  password: string;
+  setPassword: (v: string) => void;
   onSubmit: () => void;
 }) {
-  const match = pw1.length > 0 && pw1 === pw2;
-  const mismatch = pw2.length > 0 && pw1 !== pw2;
-  const canSubmit = pw1.length > 0 && pw2.length > 0 && match;
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const [show, setShow] = React.useState(false);
+  const [local, domain] = email.split("@");
+  const masked = local
+    ? local.length <= 2
+      ? local[0] + "***"
+      : local.slice(0, 2) + "***"
+    : "메일";
+  const maskedEmail = `${masked}@${domain || ""}`;
+
+  React.useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const canSubmit = password.trim().length > 0;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="text-[13px] font-semibold">새 비밀번호 설정</div>
-      <input
-        type="password"
-        value={pw1}
-        onChange={(e) => setPw1(e.target.value)}
-        placeholder="새 비밀번호"
-        className="h-12 w-full rounded-md border border-divider bg-white px-4 text-sm outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15"
-      />
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (canSubmit) onSubmit();
+      }}
+      className="flex flex-col gap-4"
+    >
       <div>
+        <div className="mb-1 text-[13px] font-semibold">비밀번호</div>
+        <p className="text-xs text-ink-secondary">
+          <span className="font-medium">{maskedEmail}</span> 계정으로 로그인합니다.
+        </p>
+      </div>
+      <div className="relative">
         <input
-          type="password"
-          value={pw2}
-          onChange={(e) => setPw2(e.target.value)}
-          placeholder="비밀번호 확인"
-          className={cn(
-            "h-12 w-full rounded-md border bg-white px-4 text-sm outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15",
-            mismatch ? "border-danger" : "border-divider"
-          )}
+          ref={inputRef}
+          type={show ? "text" : "password"}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="비밀번호를 입력하세요"
+          autoComplete="current-password"
+          className="h-12 w-full rounded-md border border-divider bg-white pl-4 pr-12 text-sm text-ink-primary outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15"
         />
-        {mismatch && (
-          <p className="mt-2 text-xs text-danger">비밀번호가 일치하지 않습니다.</p>
-        )}
-        {match && (
-          <p className="mt-2 flex items-center gap-1 text-xs text-success">
-            <Check className="h-3 w-3" strokeWidth={3} />
-            비밀번호가 일치합니다.
-          </p>
-        )}
+        <button
+          type="button"
+          onClick={() => setShow((v) => !v)}
+          className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-ink-tertiary hover:bg-muted"
+          aria-label={show ? "비밀번호 숨기기" : "비밀번호 보기"}
+        >
+          {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
+      <div className="-mt-1 flex items-center justify-end">
+        <button
+          type="button"
+          className="text-[12px] font-semibold text-brand-500 hover:text-brand-600"
+          onClick={() =>
+            alert(
+              "비밀번호 재설정 안내 메일을 발송했습니다. (데모용 — 실제로는 발송되지 않습니다.)"
+            )
+          }
+        >
+          비밀번호 찾기
+        </button>
       </div>
       <button
-        onClick={onSubmit}
+        type="submit"
         disabled={!canSubmit}
         className={cn(
           "h-12 w-full rounded-md font-semibold transition-colors",
@@ -341,9 +346,9 @@ function PasswordStep({
             : "cursor-not-allowed bg-muted text-ink-tertiary"
         )}
       >
-        완료
+        로그인
       </button>
-    </div>
+    </form>
   );
 }
 
