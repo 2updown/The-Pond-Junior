@@ -1,77 +1,87 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { Plus } from "lucide-react";
 import { usePosts } from "@/lib/posts-store";
-import { cn } from "@/lib/utils";
 
 const FALLBACK_IMAGES = [
-  "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?auto=format&fit=crop&w=800&q=80",
 ];
 
 export function HomeTeaser() {
   const notices = usePosts("notice").slice(0, 4);
-  const photos = usePosts("photo").slice(0, 4);
+  const photos = usePosts("photo").slice(0, 2);
 
   return (
-    <section className="mx-auto max-w-6xl px-5 py-14 md:py-20">
-      <div className="grid gap-10 md:grid-cols-2">
-        {/* Notices */}
-        <div>
-          <SectionHead title="공지사항" subtitle="학원의 최신 소식" href="/notices" />
-          <ul className="overflow-hidden rounded-2xl border border-divider bg-white">
+    <section className="mx-auto max-w-6xl px-5 py-7 md:py-10">
+      <div className="grid items-stretch gap-10 md:grid-cols-2">
+        {/* Notices — tab widget style */}
+        <div className="overflow-hidden rounded-2xl border-2 border-[#3B5072] bg-white">
+          {/* Tab header */}
+          <div className="flex items-center justify-between bg-[#3B5072] px-4 py-3">
+            <span className="text-xl font-bold tracking-tight text-white md:text-2xl">
+              공지사항
+            </span>
+            <Link
+              href="/notices"
+              aria-label="공지사항 더보기"
+              className="flex h-9 w-9 items-center justify-center rounded-md text-white transition-colors hover:bg-white/20"
+            >
+              <Plus className="h-5 w-5" />
+            </Link>
+          </div>
+          {/* List */}
+          <ul>
             {notices.length === 0 && (
               <li className="px-5 py-10 text-center text-sm text-ink-tertiary">
                 등록된 공지가 없습니다.
               </li>
             )}
-            {notices.map((n, i) => {
-              const isPinned = n.pinned || n.tag === "필독";
-              return (
-                <li
-                  key={n.id}
-                  className={cn(i !== notices.length - 1 && "border-b border-divider")}
+            {notices.map((n) => (
+              <li key={n.id}>
+                <Link
+                  href={`/notices/${n.id}`}
+                  className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors hover:bg-[#F5F8FF]"
                 >
-                  <Link
-                    href={`/notices/${n.id}`}
-                    className="flex items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-muted md:px-5"
-                  >
-                    <span
-                      className={cn(
-                        "rounded-md px-2 py-0.5 text-[10.5px] font-semibold",
-                        isPinned ? "bg-brand-50 text-brand-600" : "bg-muted text-ink-secondary"
-                      )}
-                    >
-                      {n.tag || (isPinned ? "필독" : "안내")}
-                    </span>
-                    <span className="flex-1 truncate text-ink-primary">{n.title}</span>
-                    <span className="hidden text-xs text-ink-tertiary md:inline">{n.date}</span>
-                  </Link>
-                </li>
-              );
-            })}
+                  <span className="h-1.5 w-1.5 flex-none rounded-full bg-ink-tertiary" />
+                  <span className="flex-1 truncate text-ink-primary">{n.title}</span>
+                  <span className="hidden text-xs text-ink-tertiary md:inline">{n.date}</span>
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
-        {/* Gallery */}
-        <div>
-          <SectionHead title="갤러리" subtitle="최근 활동 사진" href="/gallery" />
+        {/* Gallery — same tab widget style, 2 photos */}
+        <div className="overflow-hidden rounded-2xl border-2 border-[#3B5072] bg-white">
+          {/* Tab header */}
+          <div className="flex items-center justify-between bg-[#3B5072] px-4 py-3">
+            <span className="text-xl font-bold tracking-tight text-white md:text-2xl">
+              갤러리
+            </span>
+            <Link
+              href="/gallery"
+              aria-label="갤러리 더보기"
+              className="flex h-9 w-9 items-center justify-center rounded-md text-white transition-colors hover:bg-white/20"
+            >
+              <Plus className="h-5 w-5" />
+            </Link>
+          </div>
+          {/* Photos — 2 in a row */}
           {photos.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-divider bg-white py-12 text-center text-sm text-ink-tertiary">
+            <div className="px-5 py-10 text-center text-sm text-ink-tertiary">
               아직 등록된 사진이 없어요.
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 p-2">
               {photos.map((p, i) => {
                 const src = p.imageUrl || FALLBACK_IMAGES[i % FALLBACK_IMAGES.length];
                 return (
                   <Link
                     key={p.id}
                     href={`/gallery/${p.id}`}
-                    className="group relative block aspect-square overflow-hidden rounded-2xl shadow-elev1 transition-transform hover:-translate-y-0.5"
+                    className="group relative block aspect-[4/3] overflow-hidden rounded-lg shadow-elev1"
                   >
                     <img
                       src={src}
@@ -91,31 +101,5 @@ export function HomeTeaser() {
         </div>
       </div>
     </section>
-  );
-}
-
-function SectionHead({
-  title,
-  subtitle,
-  href,
-}: {
-  title: string;
-  subtitle: string;
-  href: string;
-}) {
-  return (
-    <div className="mb-4 flex items-end justify-between gap-2">
-      <div>
-        <h3 className="text-xl font-bold tracking-tight md:text-2xl">{title}</h3>
-        <p className="mt-1 text-xs text-ink-secondary">{subtitle}</p>
-      </div>
-      <Link
-        href={href}
-        className="flex items-center gap-1 text-[13px] font-semibold text-brand-500 hover:text-brand-600"
-      >
-        더보기
-        <ArrowRight className="h-3.5 w-3.5" />
-      </Link>
-    </div>
   );
 }
