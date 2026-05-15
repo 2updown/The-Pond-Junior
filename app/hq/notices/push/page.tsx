@@ -9,7 +9,7 @@ import {
   type HqNoticeAudience,
 } from "@/lib/hq-notices-store";
 import { useAcademies } from "@/lib/hq-academies-store";
-import { ComposeModal } from "../page";
+import { HqComposeModal } from "@/components/pond/hq-compose-modal";
 
 export default function HqPushPage() {
   const pushes = useHqNotices("push");
@@ -112,7 +112,7 @@ export default function HqPushPage() {
       </div>
 
       {composeOpen && (
-        <ComposeModal
+        <HqComposeModal
           academyCount={academies.length}
           activeCount={academies.filter((a) => a.status === "active").length}
           proCount={academies.filter((a) => a.plan === "pro").length}
