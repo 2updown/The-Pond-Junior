@@ -20,24 +20,12 @@ export default function LoginPage() {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col bg-page">
       {/* Logo */}
-      <div className="flex items-center justify-center gap-2 pb-4 pt-8 text-lg font-bold">
-        <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
-          <path
-            d="M2 14c2-3 4-3 6 0s4 3 6 0 4-3 6 0"
-            stroke="#3E8BFF"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M2 18c2-3 4-3 6 0s4 3 6 0 4-3 6 0"
-            stroke="#9CC2FF"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        <span>The Pond</span>
+      <div className="flex items-center justify-center pb-4 pt-8">
+        <img
+          src="/images/Pond-logo.png"
+          alt="The Pond"
+          className="h-28 w-auto object-contain"
+        />
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-1 flex-col gap-3.5 px-6 pt-2 pb-8">

@@ -4,6 +4,7 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 import { DrawerProvider } from "@/components/pond/drawer";
 import { AppChrome } from "@/components/pond/app-chrome";
+import { LandingGuard } from "@/components/pond/landing-guard";
 
 export const metadata: Metadata = {
   title: "The Pond",
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className="h-full antialiased">
         <ToastProvider>
           <Suspense fallback={null}>
+            <LandingGuard />
             <AppChrome />
             <DrawerProvider>{children}</DrawerProvider>
           </Suspense>
