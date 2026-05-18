@@ -1,11 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import { LogoMark } from "./header";
+
+const NAV_LINKS = [
+  { href: "/about", label: "학원소개" },
+  { href: "/programs", label: "프로그램" },
+  { href: "/gallery", label: "갤러리" },
+  { href: "/notices", label: "공지사항" },
+  { href: "/location", label: "오시는 길" },
+];
 
 export function LandingFooter() {
   return (
     <footer className="border-t border-divider bg-[#FAFBFD]">
-      <div className="mx-auto grid max-w-6xl gap-8 px-5 py-10 md:grid-cols-4 md:py-12">
+      <div className="mx-auto grid max-w-6xl gap-8 px-5 py-10 md:grid-cols-[1.4fr_2fr_1fr] md:py-12">
         {/* Brand */}
         <div>
           <div className="flex items-center gap-2.5">
@@ -19,49 +28,41 @@ export function LandingFooter() {
           </p>
         </div>
 
-        <FooterColumn title="학원소개">
-          <FooterLink href="#about">학원소개</FooterLink>
-          <FooterLink href="#about">교육철학</FooterLink>
-          <FooterLink href="#about">강사진 소개</FooterLink>
-        </FooterColumn>
+        {/* Site nav — matches top GNB */}
+        <nav>
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
+            {NAV_LINKS.map((n) => (
+              <li key={n.href}>
+                <Link
+                  href={n.href}
+                  className="block text-[13px] font-bold text-ink-primary hover:text-brand-500"
+                >
+                  {n.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-        <FooterColumn title="프로그램">
-          <FooterLink href="#programs">유아 프로그램</FooterLink>
-          <FooterLink href="#programs">초등 프로그램</FooterLink>
-          <FooterLink href="#programs">특별 프로그램</FooterLink>
-        </FooterColumn>
-
-        <FooterColumn title="상담문의">
+        {/* Contact */}
+        <div>
+          <div className="mb-3 text-[13px] font-bold text-ink-primary">상담문의</div>
           <div className="text-base font-bold text-ink-primary">02-1234-5678</div>
-          <FooterLink href="#location">고객센터</FooterLink>
-        </FooterColumn>
+          <a
+            href="mailto:info@letitu.com"
+            className="mt-1 block text-xs text-ink-secondary hover:text-brand-500"
+          >
+            info@letitu.com
+          </a>
+        </div>
       </div>
 
       <div className="border-t border-divider">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-5 py-4 text-[11px] text-ink-tertiary md:flex-row">
-          <div>
-            이용약관 · 개인정보처리방침 · 사업자등록번호: 123-45-67890
-          </div>
+          <div>이용약관 · 개인정보처리방침 · 사업자등록번호: 123-45-67890</div>
           <div>© 2024 레티튜초등학교. All rights reserved.</div>
         </div>
       </div>
     </footer>
-  );
-}
-
-function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col">
-      <div className="mb-3 text-[13px] font-bold text-ink-primary">{title}</div>
-      <div className="flex flex-col gap-2">{children}</div>
-    </div>
-  );
-}
-
-function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} className="block text-xs text-ink-secondary hover:text-brand-500">
-      {children}
-    </a>
   );
 }
