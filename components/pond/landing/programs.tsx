@@ -24,14 +24,8 @@ const PROGRAMS = [
 
 export function Programs() {
   return (
-    <section className="bg-[#FAFBFD] py-16 md:py-20" id="programs">
+    <section className="py-10 md:py-12" id="programs">
       <div className="mx-auto max-w-6xl px-5">
-        <div className="mb-12 text-center">
-          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">프로그램 안내</h2>
-          <p className="mt-3 text-sm text-ink-secondary">
-            아이의 성장 단계에 맞춘 다양한 프로그램을 제공합니다.
-          </p>
-        </div>
         <div className="grid gap-6 md:grid-cols-3">
           {PROGRAMS.map((p) => (
             <div

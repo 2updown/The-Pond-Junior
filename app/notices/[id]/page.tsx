@@ -2,10 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ChevronUp, ChevronDown, Home } from "lucide-react";
 import { LandingShell } from "@/components/pond/landing/landing-shell";
-import { usePosts } from "@/lib/posts-store";
+import { usePosts, removePost } from "@/lib/posts-store";
+import { useLoginState } from "@/lib/use-login-state";
+import { useToast } from "@/components/ui/toast";
 
 function maskAuthor(name?: string) {
   if (!name) return "관리자";
@@ -14,6 +16,9 @@ function maskAuthor(name?: string) {
 
 export default function NoticeDetailPage() {
   const params = useParams() as { id: string };
+  const router = useRouter();
+  const { toast } = useToast();
+  const loggedIn = useLoginState();
   const all = usePosts("notice");
   const post = all.find((p) => p.id === params.id);
 
@@ -21,6 +26,15 @@ export default function NoticeDetailPage() {
   const idx = all.findIndex((p) => p.id === params.id);
   const prevPost = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
   const nextPost = idx > 0 ? all[idx - 1] : null;
+
+  const handleDelete = () => {
+    if (!post) return;
+    if (confirm(`"${post.title}" 게시글을 삭제할까요?`)) {
+      removePost(post.id);
+      toast({ message: "게시글이 삭제되었습니다." });
+      router.push("/notices");
+    }
+  };
 
   return (
     <LandingShell>
@@ -66,8 +80,24 @@ export default function NoticeDetailPage() {
               </div>
             </article>
 
-            {/* List button */}
-            <div className="mt-4 flex justify-end">
+            {/* Action buttons */}
+            <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+              {loggedIn && (
+                <>
+                  <Link
+                    href={`/write?id=${post.id}`}
+                    className="rounded-md border border-divider bg-white px-5 py-2.5 text-sm font-semibold text-ink-primary hover:bg-muted"
+                  >
+                    수정
+                  </Link>
+                  <button
+                    onClick={handleDelete}
+                    className="rounded-md border border-rose-200 bg-white px-5 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-50"
+                  >
+                    삭제
+                  </button>
+                </>
+              )}
               <Link
                 href="/notices"
                 className="rounded-md bg-[#3B5072] px-7 py-2.5 text-sm font-semibold text-white hover:opacity-90"

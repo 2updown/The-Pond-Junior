@@ -5,7 +5,9 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ChevronLeft, Calendar, User as UserIcon } from "lucide-react";
 import { LandingShell } from "@/components/pond/landing/landing-shell";
-import { usePosts } from "@/lib/posts-store";
+import { usePosts, removePost } from "@/lib/posts-store";
+import { useLoginState } from "@/lib/use-login-state";
+import { useToast } from "@/components/ui/toast";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1600&q=80";
@@ -13,8 +15,19 @@ const FALLBACK_IMAGE =
 export default function GalleryDetailPage() {
   const params = useParams() as { id: string };
   const router = useRouter();
+  const { toast } = useToast();
+  const loggedIn = useLoginState();
   const all = usePosts("photo");
   const post = all.find((p) => p.id === params.id);
+
+  const handleDelete = () => {
+    if (!post) return;
+    if (confirm(`"${post.title}" 게시글을 삭제할까요?`)) {
+      removePost(post.id);
+      toast({ message: "게시글이 삭제되었습니다." });
+      router.push("/gallery");
+    }
+  };
 
   return (
     <LandingShell>
@@ -73,6 +86,24 @@ export default function GalleryDetailPage() {
               )}
             </div>
           </article>
+        )}
+
+        {/* Edit / Delete buttons (logged in only) */}
+        {post && loggedIn && (
+          <div className="mt-4 flex justify-end gap-2">
+            <Link
+              href={`/write?id=${post.id}`}
+              className="rounded-md border border-divider bg-white px-5 py-2.5 text-sm font-semibold text-ink-primary hover:bg-muted"
+            >
+              수정
+            </Link>
+            <button
+              onClick={handleDelete}
+              className="rounded-md border border-rose-200 bg-white px-5 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-50"
+            >
+              삭제
+            </button>
+          </div>
         )}
 
         {/* Other photos */}

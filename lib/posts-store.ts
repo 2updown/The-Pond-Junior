@@ -188,6 +188,29 @@ export function removePost(id: string) {
   writeAll(all.filter((p) => p.id !== id));
 }
 
+/** 단일 게시글 조회 (없으면 undefined) */
+export function getPost(id: string): Post | undefined {
+  return readAll().find((p) => p.id === id);
+}
+
+/** 게시글 일부 필드 업데이트. id/kind는 변경 불가. */
+export function updatePost(
+  id: string,
+  data: Partial<Omit<Post, "id" | "kind">>
+): Post | undefined {
+  const all = readAll();
+  let updated: Post | undefined;
+  const next = all.map((p) => {
+    if (p.id === id) {
+      updated = { ...p, ...data };
+      return updated;
+    }
+    return p;
+  });
+  if (updated) writeAll(next);
+  return updated;
+}
+
 /** Subscribe a React component to posts changes. Returns the current list (re-fetched on change). */
 export function usePosts(kind?: PostKind): Post[] {
   const [tick, setTick] = React.useState(0);

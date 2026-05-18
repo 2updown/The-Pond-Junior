@@ -62,7 +62,7 @@ export function NoticeBoard() {
   }, [currentPage, totalPages]);
 
   return (
-    <section className="bg-[#FAFBFD] py-8 md:py-10" id="notices">
+    <section className="py-8 md:py-10" id="notices">
       <div className="mx-auto max-w-6xl px-5">
         {/* Top filter bar */}
         <div className="flex flex-col gap-3 rounded-lg border border-divider bg-white px-4 py-3 md:flex-row md:items-center md:justify-between">

@@ -4,6 +4,7 @@ import * as React from "react";
 import { LandingHeader } from "./header";
 import { Hero } from "./hero";
 import { HomeTeaser } from "./home-teaser";
+import { ScheduleStrip } from "./schedule-strip";
 import { CtaBanner } from "./cta-banner";
 import { LandingFooter } from "./footer";
 import { LoginModal } from "./login-modal";
@@ -54,6 +55,7 @@ export function LandingShell({ children }: LandingShellProps) {
               <>
                 <Hero />
                 <HomeTeaser />
+                <ScheduleStrip />
                 <CtaBanner />
               </>
             )}

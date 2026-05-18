@@ -6,7 +6,7 @@ import { Sidebar } from "./sidebar";
 import { GlobalNavbar } from "./global-navbar";
 
 const PUBLIC_EXACT = new Set(["/"]);
-const PUBLIC_PREFIXES = ["/about", "/programs", "/gallery", "/notices", "/location"];
+const PUBLIC_PREFIXES = ["/about", "/programs", "/gallery", "/notices", "/location", "/write"];
 
 /**
  * Renders the persistent PC GNB + sidebar only for app routes (teacher / admin).
