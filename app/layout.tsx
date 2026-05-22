@@ -8,7 +8,17 @@ import { LandingGuard } from "@/components/pond/landing-guard";
 
 export const metadata: Metadata = {
   title: "The Pond",
-  description: "선생님과 학생을 잇는 학원 운영 도구",
+  description: "선생님과 학생을 잇는 플랫폼",
+  openGraph: {
+    title: "The Pond",
+    description: "선생님과 학생을 잇는 플랫폼",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Pond",
+    description: "선생님과 학생을 잇는 플랫폼",
+  },
 };
 
 export const viewport: Viewport = {
